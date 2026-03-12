@@ -1,11 +1,13 @@
 package seedu.interntrackr.model;
 
+import java.time.LocalDate;
+
 /**
  * Represents a single deadline.
  */
 public class Deadline {
     private String category;
-    private String dueDate;
+    private LocalDate dueDate;
     private boolean isDone;
 
     /**
@@ -14,7 +16,7 @@ public class Deadline {
      * @param category The category of the deadline.
      * @param dueDate  The due date of the deadline.
      */
-    public Deadline(String category, String dueDate) {
+    public Deadline(String category, LocalDate dueDate) {
         this.category = category;
         this.dueDate = dueDate;
         this.isDone = false;
@@ -27,7 +29,7 @@ public class Deadline {
      * @param dueDate  The due date of the deadline.
      * @param isDone   The completeness of the deadline.
      */
-    public Deadline(String category, String dueDate, boolean isDone) {
+    public Deadline(String category, LocalDate dueDate, boolean isDone) {
         this.category = category;
         this.dueDate = dueDate;
         this.isDone = isDone;

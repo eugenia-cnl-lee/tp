@@ -1,5 +1,6 @@
 package seedu.interntrackr.parser;
 
+import java.time.LocalDate;
 import seedu.interntrackr.command.AddCommand;
 import seedu.interntrackr.command.Command;
 import seedu.interntrackr.command.DeleteCommand;
@@ -8,7 +9,9 @@ import seedu.interntrackr.command.FilterCommand;
 import seedu.interntrackr.command.ListCommand;
 import seedu.interntrackr.command.OverviewCommand;
 import seedu.interntrackr.command.StatusCommand;
+import seedu.interntrackr.command.DeadlineCommand;
 import seedu.interntrackr.exception.InternTrackrException;
+import java.time.format.DateTimeParseException;
 
 /**
  * Parses raw user input into executable command objects.
@@ -45,6 +48,32 @@ public class Parser {
             } catch (NumberFormatException e) {
                 throw new InternTrackrException("The application index must be a number.");
             }
+
+        case "deadline":
+        if (!arguments.contains(" t/") || !arguments.contains(" d/")) {
+            throw new InternTrackrException(
+                    "Invalid format. Usage: deadline INDEX t/TYPE d/YYYY-MM-DD");
+        }
+        try {
+            int typeIndex = arguments.indexOf(" t/");
+            int dateIndex = arguments.indexOf(" d/");
+            if (typeIndex == -1 || dateIndex == -1 || typeIndex > dateIndex) {
+                throw new InternTrackrException(
+                        "Invalid format. Usage: deadline INDEX t/TYPE d/YYYY-MM-DD");
+            }
+            int index = Integer.parseInt(arguments.substring(0, typeIndex).trim());
+            String deadlineType = arguments.substring(typeIndex + 3, dateIndex).trim().replace("\"", "");
+            String dueDate = arguments.substring(dateIndex + 3).trim().replace("\"", "");
+            if (deadlineType.isEmpty() || dueDate.isEmpty()) {
+                throw new InternTrackrException("Deadline type and due date cannot be empty.");
+            }
+            LocalDate.parse(dueDate);
+            return new DeadlineCommand(index, deadlineType, dueDate);
+        } catch (NumberFormatException e) {
+            throw new InternTrackrException("The application index must be a number.");
+        } catch (DateTimeParseException e) {
+            throw new InternTrackrException("Invalid date format. Use YYYY-MM-DD.");
+        }
 
         case "delete":
             if (arguments.isEmpty()) {
