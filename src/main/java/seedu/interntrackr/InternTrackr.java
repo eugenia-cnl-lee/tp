@@ -1,6 +1,7 @@
 package seedu.interntrackr;
 
 import seedu.interntrackr.command.Command;
+import seedu.interntrackr.model.Application;
 import seedu.interntrackr.model.ApplicationList;
 import seedu.interntrackr.parser.Parser;
 import seedu.interntrackr.storage.Storage;
@@ -21,6 +22,13 @@ public class InternTrackr {
             ui.showLoadingError();
             applications = new ApplicationList();
         }
+
+        // --- TEMPORARY DUMMY DATA FOR TESTING ---
+        // REMOVE THIS BEFORE YOUR FINAL MERGE
+        applications.addApplication(new Application("Shopee", "Backend Intern"));
+        applications.addApplication(new Application("Grab", "Data Analyst"));
+        applications.addApplication(new Application("Google", "SWE Intern"));
+        // ----------------------------------------
     }
 
     public void run() {

@@ -17,4 +17,20 @@ public class ApplicationList {
     }
 
     // TODO: Add methods like addApplication(), deleteApplication(), getApplication()
+    public Application getApplication(int index) {
+        return applications.get(index);
+    }
+
+    public int getSize() {
+        return applications.size();
+    }
+
+    public ArrayList<Application> getApplications() {
+        return applications;
+    }
+
+    //temporary helper method for testing
+    public void addApplication(Application application) {
+        this.applications.add(application);
+    }
 }
