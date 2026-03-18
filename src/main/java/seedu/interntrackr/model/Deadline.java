@@ -1,6 +1,7 @@
 package seedu.interntrackr.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Represents a single deadline.
@@ -13,26 +14,40 @@ public class Deadline {
     /**
      * Constructs a Deadline with the given category, dueDate.
      *
-     * @param deadlineType The category of the deadline.
-     * @param dueDate      The due date of the deadline.
+     * @param deadlineType              The category of the deadline.
+     * @param dueDate                   The due date of the deadline.
+     * @throws NullPointerException     If deadlineType or dueDate is null.
+     * @throws IllegalArgumentException If deadlineType is blank.
      */
     public Deadline(String deadlineType, LocalDate dueDate) {
-        this.deadlineType = deadlineType;
-        this.dueDate = dueDate;
-        this.isDone = false;
+        this(deadlineType, dueDate, false);
     }
 
     /**
-     * Constructs a Deadline with the given deadlineType, dueDate, isDone.
+     * Constructs a Deadline with the given deadline type, due date, and completion status.
      *
-     * @param deadlineType The deadlineType of the deadline.
-     * @param dueDate      The due date of the deadline.
-     * @param isDone       The completeness of the deadline.
+     * @param deadlineType              The category of the deadline.
+     * @param dueDate                   The due date of the deadline.
+     * @param isDone                    The completion status of the deadline.
+     * @throws NullPointerException     If deadlineType or dueDate is null.
+     * @throws IllegalArgumentException If deadlineType is blank.
      */
     public Deadline(String deadlineType, LocalDate dueDate, boolean isDone) {
-        this.deadlineType = deadlineType;
+        Objects.requireNonNull(deadlineType, "Deadline type cannot be null");
+        Objects.requireNonNull(dueDate, "Due date cannot be null");
+
+        String trimmedDeadlineType = deadlineType.trim();
+        if (trimmedDeadlineType.isEmpty()) {
+            throw new IllegalArgumentException("Deadline type cannot be empty");
+        }
+
+        this.deadlineType = trimmedDeadlineType;
         this.dueDate = dueDate;
         this.isDone = isDone;
+
+        assert this.deadlineType != null : "Deadline type should not be null";
+        assert !this.deadlineType.isEmpty() : "Deadline type should not be empty";
+        assert this.dueDate != null : "Due date should not be null";
     }
 
     /**
@@ -49,6 +64,7 @@ public class Deadline {
      */
     public void setDone() {
         this.isDone = true;
+        assert this.isDone : "Deadline should be marked as done";
     }
 
     /**
@@ -56,6 +72,7 @@ public class Deadline {
      */
     public void setNotDone() {
         this.isDone = false;
+        assert !this.isDone : "Deadline should be marked as not done";
     }
 
     /**
@@ -70,10 +87,13 @@ public class Deadline {
     /**
      * Returns a formatted string representation of this deadline.
      *
-     * @return A human-readable string.
+     * @return A human-readable string representation of this deadline.
      */
     @Override
     public String toString() {
+        assert this.deadlineType != null : "Deadline type should not be null";
+        assert this.dueDate != null : "Due date should not be null";
+
         return "Deadline Type: " + this.deadlineType + " | Due Date: " + this.dueDate + " | Done: " + markIsDone();
     }
 
@@ -83,6 +103,9 @@ public class Deadline {
      * @return A storage-formatted string.
      */
     public String toStorageString() {
+        assert this.deadlineType != null : "Deadline type should not be null";
+        assert this.dueDate != null : "Due date should not be null";
+
         return this.deadlineType + " | " + this.dueDate + " | " + this.isDone;
     }
 }

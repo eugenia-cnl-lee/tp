@@ -3,6 +3,7 @@ package seedu.interntrackr.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 
@@ -12,6 +13,31 @@ import org.junit.jupiter.api.Test;
  * Tests for {@link Deadline}.
  */
 public class DeadlineTest {
+
+    @Test
+    public void constructor_nullDeadlineType_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () ->
+                new Deadline(null, LocalDate.of(2026, 3, 15)));
+    }
+
+    @Test
+    public void constructor_nullDueDate_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () ->
+                new Deadline("OA", null));
+    }
+
+    @Test
+    public void constructor_blankDeadlineType_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new Deadline("   ", LocalDate.of(2026, 3, 15)));
+    }
+
+    @Test
+    public void constructor_deadlineTypeWithExtraSpaces_trimsDeadlineType() {
+        Deadline deadline = new Deadline("  OA  ", LocalDate.of(2026, 3, 15));
+
+        assertEquals("OA | 2026-03-15 | false", deadline.toStorageString());
+    }
 
     @Test
     public void constructor_withoutIsDone_defaultsToNotDone() {
