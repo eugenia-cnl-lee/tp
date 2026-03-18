@@ -49,7 +49,6 @@ public class FilterCommand extends Command {
 
         for (int i = 1; i <= applications.getSize(); i++) {
             Application app = applications.getApplication(i);
-            
             if (app != null && app.getStatus().equalsIgnoreCase(this.status)) {
                 ui.showMessage(i + ". " + app.toString());
                 matchCount++;
