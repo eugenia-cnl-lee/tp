@@ -8,11 +8,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 /**
  * Handles reading from and writing to the local human-editable text file.
  */
 public class Storage {
+    private static final Logger logger = Logger.getLogger(Storage.class.getName());
+
     private String filePath;
 
     /**
@@ -21,6 +24,7 @@ public class Storage {
      * @param filePath Path to the data file.
      */
     public Storage(String filePath) {
+        assert filePath != null && !filePath.isEmpty() : "File path cannot be null or empty";
         this.filePath = filePath;
     }
 
@@ -35,25 +39,33 @@ public class Storage {
         File file = new File(filePath);
 
         if (!file.exists()) {
+            logger.info("No data file found at " + filePath + ". Starting fresh.");
             return applications;
         }
 
+        logger.info("Loading data from " + filePath);
         try (Scanner scanner = new Scanner(file)) {
+            int lineNumber = 0;
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
+                lineNumber++;
                 if (line.isEmpty()) {
                     continue;
                 }
                 String[] parts = line.split(" \\| ");
                 if (parts.length < 3) {
-                    throw new InternTrackrException("Corrupted data line: " + line);
+                    logger.warning("Corrupted data at line " + lineNumber + ": " + line);
+                    throw new InternTrackrException("Corrupted data at line " + lineNumber + ": " + line);
                 }
                 applications.add(new Application(parts[0], parts[1], parts[2]));
             }
         } catch (IOException e) {
+            logger.severe("Failed to read file: " + e.getMessage());
             throw new InternTrackrException("Error reading file: " + e.getMessage());
         }
 
+        logger.info("Loaded " + applications.size() + " applications.");
+        assert applications != null : "Loaded applications list should not be null";
         return applications;
     }
 
@@ -64,6 +76,8 @@ public class Storage {
      * @throws InternTrackrException If the file cannot be written.
      */
     public void save(ArrayList<Application> applications) throws InternTrackrException {
+        assert applications != null : "Applications list cannot be null";
+        logger.info("Saving " + applications.size() + " applications to " + filePath);
         try {
             File file = new File(filePath);
             file.getParentFile().mkdirs();
@@ -73,7 +87,9 @@ public class Storage {
             }
             writer.close();
         } catch (IOException e) {
+            logger.severe("Failed to save file: " + e.getMessage());
             throw new InternTrackrException("Error saving file: " + e.getMessage());
         }
+        logger.info("Save successful.");
     }
 }
