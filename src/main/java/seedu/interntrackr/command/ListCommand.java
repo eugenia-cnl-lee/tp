@@ -6,10 +6,13 @@ import seedu.interntrackr.model.ApplicationList;
 import seedu.interntrackr.storage.Storage;
 import seedu.interntrackr.ui.Ui;
 
+import java.util.logging.Logger;
+
 /**
  * Lists all internship applications currently tracked.
  */
 public class ListCommand extends Command {
+    private static final Logger logger = Logger.getLogger(ListCommand.class.getName());
 
     /**
      * Executes the list command and prints all applications to the console.
@@ -21,6 +24,9 @@ public class ListCommand extends Command {
      */
     @Override
     public void execute(ApplicationList applications, Ui ui, Storage storage) throws InternTrackrException {
+        assert applications != null : "ApplicationList cannot be null";
+        logger.info("Executing ListCommand. Total applications: " + applications.getSize());
+
         if (applications.getSize() == 0) {
             System.out.println("No applications found. Start adding some!");
             return;
@@ -30,5 +36,6 @@ public class ListCommand extends Command {
             Application app = applications.getApplication(i);
             System.out.println(i + ". " + app.toString());
         }
+        logger.fine("Listed " + applications.getSize() + " applications successfully.");
     }
 }
