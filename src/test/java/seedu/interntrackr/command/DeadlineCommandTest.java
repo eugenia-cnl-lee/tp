@@ -42,16 +42,9 @@ public class DeadlineCommandTest {
     }
 
     @Test
-    public void execute_indexLessThanOne_throwsInternTrackrException() {
-        DeadlineCommand command = new DeadlineCommand(0, "OA", LocalDate.of(2026, 3, 15));
-
-        InternTrackrException exception = assertThrows(InternTrackrException.class,
-                () -> command.execute(applications, ui, storage));
-
-        assertEquals("Invalid application index.", exception.getMessage());
-        assertNull(applications.getApplication(1).getDeadline());
-        assertNull(applications.getApplication(2).getDeadline());
-        assertNull(ui.lastMessage);
+    public void constructor_indexLessThanOne_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new DeadlineCommand(0, "OA", LocalDate.of(2026, 3, 15)));
     }
 
     @Test
@@ -65,6 +58,24 @@ public class DeadlineCommandTest {
         assertNull(applications.getApplication(1).getDeadline());
         assertNull(applications.getApplication(2).getDeadline());
         assertNull(ui.lastMessage);
+    }
+
+    @Test
+    public void constructor_nullDeadlineType_throwsNullPointerException() {
+        assertThrows(NullPointerException.class,
+                () -> new DeadlineCommand(1, null, LocalDate.of(2026, 3, 15)));
+    }
+
+    @Test
+    public void constructor_blankDeadlineType_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new DeadlineCommand(1, "   ", LocalDate.of(2026, 3, 15)));
+    }
+
+    @Test
+    public void constructor_nullDueDate_throwsNullPointerException() {
+        assertThrows(NullPointerException.class,
+                () -> new DeadlineCommand(1, "OA", null));
     }
 
     @Test
@@ -94,7 +105,7 @@ public class DeadlineCommandTest {
         command.execute(applications, ui, storage);
 
         assertEquals(
-                "Deadline updated! Google's SWE Intern 's OA due date is now on the [2026-03-15]",
+                "Deadline updated! Google's SWE Intern's OA due date is now on the [2026-03-15]",
                 ui.lastMessage);
     }
 
@@ -113,6 +124,27 @@ public class DeadlineCommandTest {
         assertEquals(
                 "Meta | Product Intern | Applied | null",
                 lines.get(1));
+    }
+
+    @Test
+    public void execute_nullApplicationList_throwsAssertionError() {
+        DeadlineCommand command = new DeadlineCommand(1, "OA", LocalDate.of(2026, 3, 15));
+
+        assertThrows(AssertionError.class, () -> command.execute(null, ui, storage));
+    }
+
+    @Test
+    public void execute_nullUi_throwsAssertionError() {
+        DeadlineCommand command = new DeadlineCommand(1, "OA", LocalDate.of(2026, 3, 15));
+
+        assertThrows(AssertionError.class, () -> command.execute(applications, null, storage));
+    }
+
+    @Test
+    public void execute_nullStorage_throwsAssertionError() {
+        DeadlineCommand command = new DeadlineCommand(1, "OA", LocalDate.of(2026, 3, 15));
+
+        assertThrows(AssertionError.class, () -> command.execute(applications, ui, null));
     }
 
     /**
