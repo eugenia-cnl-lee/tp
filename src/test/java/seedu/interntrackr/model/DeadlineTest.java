@@ -102,5 +102,4 @@ public class DeadlineTest {
 
         assertEquals("Interview | 2026-03-20 | true", deadline.toStorageString());
     }
-
 }
