@@ -17,16 +17,36 @@ public class FilterCommand extends Command {
     private final String status;
     private final boolean isClear;
 
+    /**
+     * Constructs a FilterCommand to filter applications by a specific status.
+     *
+     * @param status The status string to filter by.
+     */
     public FilterCommand(String status) {
         this.status = (status == null) ? "" : status.trim();
         this.isClear = false;
     }
 
+    /**
+     * Constructs a FilterCommand to either clear existing filters or apply a blank filter.
+     *
+     * @param isClear True to clear the filter and show all applications.
+     */
     public FilterCommand(boolean isClear) {
         this.status = "";
         this.isClear = isClear;
     }
 
+    /**
+     * Executes the filter command.
+     * Validates the status, normalizes it for a case-insensitive search, and
+     * displays matching applications to the user.
+     *
+     * @param applications The list of current internship applications.
+     * @param ui The user interface to display the filtered list.
+     * @param storage The storage handler (not used for filtering).
+     * @throws InternTrackrException If the filter status is empty or invalid.
+     */
     @Override
     public void execute(ApplicationList applications, Ui ui, Storage storage) throws InternTrackrException {
         assert applications != null : "ApplicationList cannot be null during execution";
@@ -72,6 +92,12 @@ public class FilterCommand extends Command {
         }
     }
 
+    /**
+     * Clears any active filters and displays the full list of internship applications.
+     *
+     * @param applications The list of all internship applications.
+     * @param ui The user interface to display the full list.
+     */
     private void handleClearFilter(ApplicationList applications, Ui ui) {
         ui.showMessage("Filter cleared. Showing all applications:");
         for (int i = 1; i <= applications.getSize(); i++) {

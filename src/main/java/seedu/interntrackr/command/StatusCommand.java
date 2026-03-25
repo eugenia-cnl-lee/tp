@@ -17,11 +17,27 @@ public class StatusCommand extends Command {
     private final int index;
     private final String status;
 
+    /**
+     * Constructs a StatusCommand with the specified application index and new status.
+     *
+     * @param index The 1-based index of the application in the list.
+     * @param status The new status to be assigned to the application.
+     */
     public StatusCommand(int index, String status) {
         this.index = index;
         this.status = (status == null) ? "" : status.trim();
     }
 
+    /**
+     * Executes the status update command.
+     * Validates the index and status, normalizes the status string, updates the
+     * application, and saves the changes to storage.
+     *
+     * @param applications The list of current internship applications.
+     * @param ui The user interface to display messages.
+     * @param storage The storage handler to save updated data.
+     * @throws InternTrackrException If the index is out of bounds or the status is invalid.
+     */
     @Override
     public void execute(ApplicationList applications, Ui ui, Storage storage) throws InternTrackrException {
         assert applications != null : "ApplicationList dependency is missing";

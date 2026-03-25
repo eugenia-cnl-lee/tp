@@ -71,6 +71,13 @@ public class Application {
         logger.fine("Created application with deadline: " + company + " | " + role);
     }
 
+    /**
+     * Checks if the provided status string matches any of the allowed application statuses,
+     * ignoring case sensitivity.
+     *
+     * @param status The status string to validate.
+     * @return True if the status is valid, false otherwise.
+     */
     public static boolean isValidStatus(String status) {
         for (String valid : VALID_STATUSES) {
             if (valid.equalsIgnoreCase(status)) {
@@ -80,6 +87,13 @@ public class Application {
         return false;
     }
 
+    /**
+     * Returns the standardized (Proper Case) version of a valid status string.
+     * If the status is invalid, it returns the original string.
+     *
+     * @param status The status string to normalize.
+     * @return The normalized status string (e.g., "Applied" instead of "applied").
+     */
     public static String getNormalizedStatus(String status) {
         for (String valid : VALID_STATUSES) {
             if (valid.equalsIgnoreCase(status)) {
@@ -117,9 +131,9 @@ public class Application {
     }
 
     /**
-     * Sets the status of this application.
+     * Updates the status of the internship application.
      *
-     * @param status The new status.
+     * @param status The new status to be assigned.
      */
     public void setStatus(String status) {
         assert status != null && !status.isEmpty() : "Status cannot be null or empty";
