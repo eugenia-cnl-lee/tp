@@ -6,6 +6,8 @@ import seedu.interntrackr.storage.Storage;
 import seedu.interntrackr.ui.Ui;
 import seedu.interntrackr.exception.InternTrackrException;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,6 +18,9 @@ public class StatusCommand extends Command {
     private static final Logger logger = Logger.getLogger(StatusCommand.class.getName());
     private final int index;
     private final String status;
+    private static final List<String> VALID_STATUSES = Arrays.asList(
+            "Applied", "Pending", "Interview", "Offered", "Rejected", "Accepted"
+    );
 
     public StatusCommand(int index, String status) {
         this.index = index;
@@ -39,6 +44,17 @@ public class StatusCommand extends Command {
         if (this.status.isEmpty()) {
             logger.log(Level.WARNING, "Attempted to set an empty status.");
             throw new InternTrackrException("The new status cannot be empty.");
+        }
+
+        if (!VALID_STATUSES.contains(this.status)) {
+            logger.log(Level.WARNING, "Invalid status assigned: " + this.status);
+            throw new InternTrackrException("Invalid status assigned. Please use one of the following:\n"
+                    + "Applied\n"
+                    + "Pending\n"
+                    + "Interview\n"
+                    + "Offered\n"
+                    + "Rejected\n"
+                    + "Accepted");
         }
 
         Application app = applications.getApplication(index);
