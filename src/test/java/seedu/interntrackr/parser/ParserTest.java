@@ -1,8 +1,9 @@
 package seedu.interntrackr.parser;
 
 import org.junit.jupiter.api.Test;
-import seedu.interntrackr.command.AddCommand;
-import seedu.interntrackr.command.DeleteCommand;
+import seedu.interntrackr.command.ExitCommand;
+import seedu.interntrackr.command.ListCommand;
+import seedu.interntrackr.command.OverviewCommand;
 import seedu.interntrackr.exception.InternTrackrException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,26 +12,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ParserTest {
 
     @Test
-    public void parse_validAddCommand_returnsAddCommand() throws InternTrackrException {
-        String input = "add c/Google r/Software Engineer";
-        assertTrue(Parser.parse(input) instanceof AddCommand);
+    public void parse_listCommand_returnsListCommand() throws InternTrackrException {
+        assertTrue(Parser.parse("list") instanceof ListCommand);
     }
 
     @Test
-    public void parse_validDeleteCommand_returnsDeleteCommand() throws InternTrackrException {
-        String input = "delete 1";
-        assertTrue(Parser.parse(input) instanceof DeleteCommand);
+    public void parse_overviewCommand_returnsOverviewCommand() throws InternTrackrException {
+        assertTrue(Parser.parse("overview") instanceof OverviewCommand);
     }
 
     @Test
-    public void parse_addMissingParameters_throwsException() {
-        String input = "add c/Google";
-        assertThrows(InternTrackrException.class, () -> Parser.parse(input));
+    public void parse_exitCommand_returnsExitCommand() throws InternTrackrException {
+        assertTrue(Parser.parse("exit") instanceof ExitCommand);
     }
 
     @Test
-    public void parse_unknownCommand_throwsException() {
-        String input = "invalidCommand";
-        assertThrows(InternTrackrException.class, () -> Parser.parse(input));
+    public void parse_unknownCommand_throwsInternTrackrException() {
+        assertThrows(InternTrackrException.class, () -> Parser.parse("invalidCommand"));
+    }
+
+    @Test
+    public void parse_blankInput_throwsInternTrackrException() {
+        assertThrows(InternTrackrException.class, () -> Parser.parse("   "));
     }
 }
