@@ -12,6 +12,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Logger;
+import java.util.List;
 
 /**
  * Handles reading from and writing to the local human-editable text file.
@@ -106,7 +107,7 @@ public class Storage {
      * @param applications The list to save.
      * @throws InternTrackrException If the file cannot be written.
      */
-    public void save(ArrayList<Application> applications) throws InternTrackrException {
+    public void save(List<Application> applications) throws InternTrackrException {
         assert applications != null : "Applications list cannot be null";
         logger.info("Saving " + applications.size() + " applications to " + filePath);
         try {

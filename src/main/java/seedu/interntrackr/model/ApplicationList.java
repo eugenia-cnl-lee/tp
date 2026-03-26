@@ -4,6 +4,8 @@ import seedu.interntrackr.exception.InternTrackrException;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Manages the in-memory list of internship applications.
@@ -83,11 +85,11 @@ public class ApplicationList {
     }
 
     /**
-     * Returns all applications as an ArrayList.
+     * Returns an unmodifiable view of all applications.
      *
-     * @return The full list of applications.
+     * @return An unmodifiable list of applications.
      */
-    public ArrayList<Application> getApplications() {
-        return applications;
+    public List<Application> getApplications() {
+        return Collections.unmodifiableList(applications);
     }
 }
