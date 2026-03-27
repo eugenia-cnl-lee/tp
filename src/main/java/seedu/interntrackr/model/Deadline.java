@@ -52,6 +52,24 @@ public class Deadline {
     }
 
     /**
+     * Returns the category of this deadline.
+     *
+     * @return The deadline's deadlineType field.
+     */
+    public String getDeadlineType() {
+        return this.deadlineType;
+    }
+
+    /**
+     * Returns the due date of this deadline.
+     *
+     * @return The deadline's dueDate field.
+     */
+    public LocalDate getDueDate() {
+        return this.dueDate;
+    }
+
+    /**
      * Returns the completeness of this deadline.
      *
      * @return The deadline's isDone field.
