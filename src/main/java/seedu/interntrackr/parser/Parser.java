@@ -2,10 +2,7 @@ package seedu.interntrackr.parser;
 
 import java.util.logging.Logger;
 
-import seedu.interntrackr.command.Command;
-import seedu.interntrackr.command.ExitCommand;
-import seedu.interntrackr.command.ListCommand;
-import seedu.interntrackr.command.OverviewCommand;
+import seedu.interntrackr.command.*;
 import seedu.interntrackr.exception.InternTrackrException;
 
 /**
@@ -46,6 +43,10 @@ public class Parser {
             return FilterCommandParser.parse(arguments);
         case "deadline":
             return DeadlineCommandParser.parse(arguments);
+        case "find":
+            return new FindCommandParser().parse(arguments);
+        case "clear":
+            return new ClearCommand();
         case "overview":
             logger.fine("Parsed: OverviewCommand");
             return new OverviewCommand();
