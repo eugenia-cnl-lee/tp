@@ -71,8 +71,8 @@ public class DeadlineCommand extends Command {
 
         // Set deadline for the specified application
         Application app = applications.getApplication(index);
-        app.setDeadline(newDeadline);
-        assert app.getDeadline() != null : "Deadline should have been set";
+        app.setDeadlines(newDeadline);
+        assert app.getDeadlines() != null : "Deadline should have been set";
 
         // Show UI message
         ui.showMessage("Deadline updated! " + app.getCompany() + "'s " + app.getRole()
