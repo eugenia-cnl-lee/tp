@@ -21,9 +21,9 @@ import seedu.interntrackr.storage.Storage;
 import seedu.interntrackr.ui.Ui;
 
 /**
- * Tests for {@link DeadlineCommand}.
+ * Tests for {@link DeadlineAddCommand}.
  */
-public class DeadlineCommandTest {
+public class DeadlineAddCommandTest {
 
     @TempDir
     Path tempDir;
@@ -45,12 +45,12 @@ public class DeadlineCommandTest {
     @Test
     public void constructor_indexLessThanOne_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
-                () -> new DeadlineCommand(0, "OA", LocalDate.of(2026, 3, 15)));
+                () -> new DeadlineAddCommand(0, "OA", LocalDate.of(2026, 3, 15)));
     }
 
     @Test
     public void execute_indexGreaterThanApplicationListSize_throwsInternTrackrException() {
-        DeadlineCommand command = new DeadlineCommand(3, "OA", LocalDate.of(2026, 3, 15));
+        DeadlineAddCommand command = new DeadlineAddCommand(3, "OA", LocalDate.of(2026, 3, 15));
 
         InternTrackrException exception = assertThrows(InternTrackrException.class,
                 () -> command.execute(applications, ui, storage));
@@ -64,24 +64,24 @@ public class DeadlineCommandTest {
     @Test
     public void constructor_nullDeadlineType_throwsNullPointerException() {
         assertThrows(NullPointerException.class,
-                () -> new DeadlineCommand(1, null, LocalDate.of(2026, 3, 15)));
+                () -> new DeadlineAddCommand(1, null, LocalDate.of(2026, 3, 15)));
     }
 
     @Test
     public void constructor_blankDeadlineType_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
-                () -> new DeadlineCommand(1, "   ", LocalDate.of(2026, 3, 15)));
+                () -> new DeadlineAddCommand(1, "   ", LocalDate.of(2026, 3, 15)));
     }
 
     @Test
     public void constructor_nullDueDate_throwsNullPointerException() {
         assertThrows(NullPointerException.class,
-                () -> new DeadlineCommand(1, "OA", null));
+                () -> new DeadlineAddCommand(1, "OA", null));
     }
 
     @Test
     public void execute_validIndex_setsDeadlineOnSpecifiedApplication() {
-        DeadlineCommand command = new DeadlineCommand(1, "OA", LocalDate.of(2026, 3, 15));
+        DeadlineAddCommand command = new DeadlineAddCommand(1, "OA", LocalDate.of(2026, 3, 15));
 
         command.execute(applications, ui, storage);
 
@@ -92,7 +92,7 @@ public class DeadlineCommandTest {
 
     @Test
     public void execute_validIndex_doesNotModifyOtherApplications() {
-        DeadlineCommand command = new DeadlineCommand(1, "OA", LocalDate.of(2026, 3, 15));
+        DeadlineAddCommand command = new DeadlineAddCommand(1, "OA", LocalDate.of(2026, 3, 15));
 
         command.execute(applications, ui, storage);
 
@@ -101,7 +101,7 @@ public class DeadlineCommandTest {
 
     @Test
     public void execute_validIndex_showsCorrectSuccessMessage() {
-        DeadlineCommand command = new DeadlineCommand(1, "OA", LocalDate.of(2026, 3, 15));
+        DeadlineAddCommand command = new DeadlineAddCommand(1, "OA", LocalDate.of(2026, 3, 15));
 
         command.execute(applications, ui, storage);
 
@@ -112,7 +112,7 @@ public class DeadlineCommandTest {
 
     @Test
     public void execute_validIndex_savesUpdatedApplicationsToStorage() throws Exception {
-        DeadlineCommand command = new DeadlineCommand(1, "OA", LocalDate.of(2026, 3, 15));
+        DeadlineAddCommand command = new DeadlineAddCommand(1, "OA", LocalDate.of(2026, 3, 15));
 
         command.execute(applications, ui, storage);
 
@@ -129,21 +129,21 @@ public class DeadlineCommandTest {
 
     @Test
     public void execute_nullApplicationList_throwsAssertionError() {
-        DeadlineCommand command = new DeadlineCommand(1, "OA", LocalDate.of(2026, 3, 15));
+        DeadlineAddCommand command = new DeadlineAddCommand(1, "OA", LocalDate.of(2026, 3, 15));
 
         assertThrows(AssertionError.class, () -> command.execute(null, ui, storage));
     }
 
     @Test
     public void execute_nullUi_throwsAssertionError() {
-        DeadlineCommand command = new DeadlineCommand(1, "OA", LocalDate.of(2026, 3, 15));
+        DeadlineAddCommand command = new DeadlineAddCommand(1, "OA", LocalDate.of(2026, 3, 15));
 
         assertThrows(AssertionError.class, () -> command.execute(applications, null, storage));
     }
 
     @Test
     public void execute_nullStorage_throwsAssertionError() {
-        DeadlineCommand command = new DeadlineCommand(1, "OA", LocalDate.of(2026, 3, 15));
+        DeadlineAddCommand command = new DeadlineAddCommand(1, "OA", LocalDate.of(2026, 3, 15));
 
         assertThrows(AssertionError.class, () -> command.execute(applications, ui, null));
     }

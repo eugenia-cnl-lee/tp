@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.logging.Logger;
 
-import seedu.interntrackr.command.DeadlineCommand;
+import seedu.interntrackr.command.DeadlineAddCommand;
 import seedu.interntrackr.exception.InternTrackrException;
 
 /**
@@ -22,14 +22,14 @@ public class DeadlineCommandParser {
     private static final String DEADLINE_SUBCOMMAND = "add ";
 
     /**
-     * Parses the given arguments and returns a DeadlineCommand.
+     * Parses the given arguments and returns a DeadlineAddCommand.
      *
      * @param arguments The argument string following the "deadline" keyword.
-     * @return A new DeadlineCommand with the parsed index, type, and due date.
+     * @return A new DeadlineAddCommand with the parsed index, type, and due date.
      * @throws InternTrackrException If the format is invalid, the index is non-numeric,
      *     or the date format is incorrect.
      */
-    public static DeadlineCommand parse(String arguments) throws InternTrackrException {
+    public static DeadlineAddCommand parse(String arguments) throws InternTrackrException {
         if (!arguments.startsWith(DEADLINE_SUBCOMMAND)) {
             logger.warning("Deadline command missing 'add' subcommand.");
             throw new InternTrackrException(
@@ -62,8 +62,8 @@ public class DeadlineCommandParser {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
             LocalDate dueDate = LocalDate.parse(dueDateStr, formatter);
 
-            logger.fine("Parsed: DeadlineCommand index=" + index + " type=" + deadlineType);
-            return new DeadlineCommand(index, deadlineType, dueDate);
+            logger.fine("Parsed: DeadlineAddCommand index=" + index + " type=" + deadlineType);
+            return new DeadlineAddCommand(index, deadlineType, dueDate);
 
         } catch (NumberFormatException e) {
             logger.warning("Deadline index is not a number.");

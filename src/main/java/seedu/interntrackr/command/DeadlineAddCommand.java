@@ -15,15 +15,15 @@ import seedu.interntrackr.ui.Ui;
 /**
  * Adds an application deadline to an internship.
  */
-public class DeadlineCommand extends Command {
-    private static final Logger logger = Logger.getLogger(DeadlineCommand.class.getName());
+public class DeadlineAddCommand extends Command {
+    private static final Logger logger = Logger.getLogger(DeadlineAddCommand.class.getName());
 
     private final int index;
     private final String deadlineType;
     private final LocalDate dueDate;
 
     /**
-     * Constructs a DeadlineCommand for the specified application index, deadline type, and due date.
+     * Constructs a DeadlineAddCommand for the specified application index, deadline type, and due date.
      *
      * @param index The 1-based index of the application.
      * @param deadlineType The type of the deadline.
@@ -31,7 +31,7 @@ public class DeadlineCommand extends Command {
      * @throws IllegalArgumentException If index is not positive or deadlineType is blank.
      * @throws NullPointerException If deadlineType or dueDate is null.
      */
-    public DeadlineCommand(int index, String deadlineType, LocalDate dueDate) {
+    public DeadlineAddCommand(int index, String deadlineType, LocalDate dueDate) {
         if (index <= 0) {
             throw new IllegalArgumentException("Index must be a positive integer.");
         }
@@ -59,7 +59,7 @@ public class DeadlineCommand extends Command {
         assert ui != null : "Ui should not be null";
         assert storage != null : "Storage should not be null";
 
-        logger.info("Executing DeadlineCommand for application index " + index);
+        logger.info("Executing DeadlineAddCommand for application index " + index);
 
         if (index < 1 || index > applications.getSize()) {
             logger.warning("Invalid application index: " + index);
