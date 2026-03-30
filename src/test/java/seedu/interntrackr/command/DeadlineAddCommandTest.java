@@ -56,8 +56,8 @@ public class DeadlineAddCommandTest {
                 () -> command.execute(applications, ui, storage));
 
         assertEquals("Invalid application index.", exception.getMessage());
-        assertNull(applications.getApplication(1).getDeadlines());
-        assertNull(applications.getApplication(2).getDeadlines());
+        assertEquals(0, applications.getApplication(1).getDeadlines().getSize());
+        assertEquals(0, applications.getApplication(2).getDeadlines().getSize());
         assertNull(ui.lastMessage);
     }
 
@@ -85,9 +85,10 @@ public class DeadlineAddCommandTest {
 
         command.execute(applications, ui, storage);
 
+        assertEquals(1, applications.getApplication(1).getDeadlines().getSize());
         assertEquals(
                 "Deadline Type: OA | Due Date: 2026-03-15 | Done: [ ]",
-                applications.getApplication(1).getDeadlines().toString());
+                applications.getApplication(1).getDeadlines().getDeadlines().get(0).toString());
     }
 
     @Test
@@ -96,7 +97,7 @@ public class DeadlineAddCommandTest {
 
         command.execute(applications, ui, storage);
 
-        assertNull(applications.getApplication(2).getDeadlines());
+        assertEquals(0, applications.getApplication(2).getDeadlines().getSize());
     }
 
     @Test
