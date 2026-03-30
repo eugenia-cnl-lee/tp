@@ -1,10 +1,13 @@
 package seedu.interntrackr.model;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 import java.util.Collections;
 import java.util.List;
 
 public class DeadlineList {
+
+    private static final Logger logger = Logger.getLogger(ApplicationList.class.getName());
 
     private ArrayList<Deadline> deadlines;
 
@@ -21,6 +24,7 @@ public class DeadlineList {
      * @param deadlines The preloaded list of deadlines.
      */
     public DeadlineList(ArrayList<Deadline> deadlines) {
+        assert deadlines != null : "Deadlines list cannot be null";
         this.deadlines = deadlines;
     }
 
@@ -30,7 +34,9 @@ public class DeadlineList {
      * @param deadline The deadline to add.
      */
     public void addDeadline(Deadline deadline) {
+        assert deadline != null : "Deadline cannot be null";
         deadlines.add(deadline);
+        logger.fine("Added deadline: " + deadline.getDeadlineType() + " | " + deadline.getDueDate());
     }
 
     /**
