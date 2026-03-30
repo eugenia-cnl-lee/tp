@@ -34,9 +34,9 @@ public class DeadlineCommandParser {
      * @throws InternTrackrException If the format is invalid.
      */
     public static Command parse(String arguments) throws InternTrackrException {
+        // TODO: temporary placeholder, should throw out a list of deadline command words
         if (arguments == null || arguments.isBlank()) {
-            throw new InternTrackrException(
-                    "Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY or deadline list INDEX");
+            throw new InternTrackrException(DEADLINE_ADD_USAGE);
         }
 
         String[] parts = arguments.trim().split(" ", 2);
@@ -49,8 +49,8 @@ public class DeadlineCommandParser {
         case "list":
             return parseListCommand(subcommandArgs);
         default:
-            throw new InternTrackrException(
-                    "Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY or deadline list INDEX");
+            // TODO: temporary placeholder, should throw out a list of deadline command words
+            throw new InternTrackrException(DEADLINE_ADD_USAGE);
         }
     }
 
