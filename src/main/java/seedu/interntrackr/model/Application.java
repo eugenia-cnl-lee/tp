@@ -76,7 +76,10 @@ public class Application {
         this.contactName = contactName;
         this.contactEmail = null;
         this.deadlines = new DeadlineList();
-        logger.fine("Created application with contact name: " + company + " | " + role + " | " + status + " | " + contactName);
+        logger.fine("Created application with contact name: " + company +
+                " | " + role +
+                " | " + status +
+                " | " + contactName);
     }
 
     /**
@@ -98,7 +101,11 @@ public class Application {
         this.contactName = contactName;
         this.contactEmail = contactEmail;
         this.deadlines = new DeadlineList();
-        logger.fine("Created application with contact name and contact email: " + company + " | " + role + " | " + status + " | " + contactName + " | " + contactEmail);
+        logger.fine("Created application with contact name and contact email: " + company +
+                " | " + role +
+                " | " + status +
+                " | " + contactName +
+                " | " + contactEmail);
     }
 
     /**
@@ -111,7 +118,8 @@ public class Application {
      * @param contactEmail The contact email for this application.
      * @param deadlines    The deadlines of this application.
      */
-    public Application(String company, String role, String status, String contactName, String contactEmail, DeadlineList deadlines) {
+    public Application(String company, String role, String status,
+                       String contactName, String contactEmail, DeadlineList deadlines) {
         assert company != null && !company.isEmpty() : "Company name cannot be null or empty";
         assert role != null && !role.isEmpty() : "Role cannot be null or empty";
         assert status != null && !status.isEmpty() : "Status cannot be null or empty";
@@ -121,7 +129,12 @@ public class Application {
         this.contactName = contactName;
         this.contactEmail = contactEmail;
         this.deadlines = deadlines;
-        logger.fine("Created application with deadlines: " + company + " | " + role + " | " + status + " | " + contactName + " | " + contactEmail + " | " + deadlines);
+        logger.fine("Created application with deadlines: " + company +
+                " | " + role +
+                " | " + status +
+                " | " + contactName +
+                " | " + contactEmail +
+                " | " + deadlines);
     }
 
     /**
