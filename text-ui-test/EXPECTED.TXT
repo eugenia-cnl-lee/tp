@@ -3,57 +3,55 @@ Welcome to InternTrackr! Ready to hunt for some internships?
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this application:
-  Company: Google | Role: Software Engineer | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
+  Company: Google | Role: Software Engineer | Status: Applied | Salary: - | Contact Name: - | Contact Email: - | Deadlines: null
 Now you have 1 application(s) in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this application:
-  Company: Meta | Role: Data Scientist | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
+  Company: Meta | Role: Data Scientist | Status: Applied | Salary: - | Contact Name: - | Contact Email: - | Deadlines: null
 Now you have 2 application(s) in the list.
 ____________________________________________________________
 ____________________________________________________________
-Got it. I've added this application:
-  Company: Apple | Role: Product Manager | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
-Now you have 3 application(s) in the list.
+Error: Input cannot be empty. Please enter a command.
+____________________________________________________________
+____________________________________________________________
+Error: I'm sorry, but I don't know what that command means :-(
+____________________________________________________________
+____________________________________________________________
+Error: Input cannot be empty. Please enter a command.
+____________________________________________________________
+____________________________________________________________
+Error: Invalid format. Usage: add c/COMPANY r/ROLE
+____________________________________________________________
+____________________________________________________________
+Error: Invalid format. Usage: add c/COMPANY r/ROLE
+____________________________________________________________
+____________________________________________________________
+Error: Invalid format. Usage: add c/COMPANY r/ROLE
 ____________________________________________________________
 ____________________________________________________________
 You have already tracked an application for Software Engineer at Google.
 ____________________________________________________________
 ____________________________________________________________
-Here are your internship applications:
-1. Company: Google | Role: Software Engineer | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
-2. Company: Meta | Role: Data Scientist | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
-3. Company: Apple | Role: Product Manager | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
+Error: Input cannot be empty. Please enter a command.
 ____________________________________________________________
 ____________________________________________________________
-Here are the matching applications in your list:
-1. Company: Google | Role: Software Engineer | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
+Error: The find command requires a keyword! (e.g., find Google)
 ____________________________________________________________
 ____________________________________________________________
-Here are the matching applications in your list:
-3. Company: Apple | Role: Product Manager | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
+Error: Input cannot be empty. Please enter a command.
 ____________________________________________________________
 ____________________________________________________________
-No matching applications found.
+Error: Invalid format. Usage: status INDEX s/STATUS
 ____________________________________________________________
 ____________________________________________________________
-Status updated! Google is now marked as [Interview]
+Error: Invalid format. Usage: status INDEX s/STATUS
 ____________________________________________________________
 ____________________________________________________________
-Error: Invalid status assigned. Please use one of the following:
-Applied
-Pending
-Interview
-Offered
-Rejected
-Accepted
+Error: The application index must be a number.
 ____________________________________________________________
 ____________________________________________________________
-Error: Invalid application index. Please provide a number between 1 and 3
-____________________________________________________________
-____________________________________________________________
-Here are the applications with status: Interview
-1. Company: Google | Role: Software Engineer | Status: Interview | Contact Name: - | Contact Email: - | Deadlines: null
+Error: Invalid application index. Please provide a number between 1 and 2
 ____________________________________________________________
 ____________________________________________________________
 Error: Invalid status assigned. Please use one of the following:
@@ -65,10 +63,25 @@ Rejected
 Accepted
 ____________________________________________________________
 ____________________________________________________________
-Filter cleared. Showing all applications:
-1. Company: Google | Role: Software Engineer | Status: Interview | Contact Name: - | Contact Email: - | Deadlines: null
-2. Company: Meta | Role: Data Scientist | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
-3. Company: Apple | Role: Product Manager | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
+Error: Input cannot be empty. Please enter a command.
+____________________________________________________________
+____________________________________________________________
+Error: Invalid format. Usage: filter s/STATUS or filter clear
+____________________________________________________________
+____________________________________________________________
+Error: Invalid format. Usage: filter s/STATUS
+____________________________________________________________
+____________________________________________________________
+Error: Invalid status assigned. Please use one of the following:
+Applied
+Pending
+Interview
+Offered
+Rejected
+Accepted
+____________________________________________________________
+____________________________________________________________
+Error: Input cannot be empty. Please enter a command.
 ____________________________________________________________
 ____________________________________________________________
 Error: Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]
@@ -77,33 +90,65 @@ ____________________________________________________________
 Error: Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]
 ____________________________________________________________
 ____________________________________________________________
-Overview:
-You are currently tracking 3 applications.
-Keep up the momentum!
+Error: The application index must be a number.
 ____________________________________________________________
 ____________________________________________________________
-Noted. I've removed this application:
-  Company: Meta | Role: Data Scientist | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
-Now you have 2 application(s) in the list.
+Error: Invalid application index.
+____________________________________________________________
+____________________________________________________________
+Error: Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]
+____________________________________________________________
+____________________________________________________________
+Error: Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]
+____________________________________________________________
+____________________________________________________________
+Error: Invalid date format. Use DD-MM-YYYY.
+____________________________________________________________
+____________________________________________________________
+Error: Input cannot be empty. Please enter a command.
+____________________________________________________________
+____________________________________________________________
+Error: Invalid format! Use: offer INDEX s/[SALARY]
+____________________________________________________________
+____________________________________________________________
+Error: Please specify the salary using the 's/' prefix. Example: offer 1 s/5000
+____________________________________________________________
+____________________________________________________________
+Error: Index and salary must be valid numerical values.
+____________________________________________________________
+____________________________________________________________
+Error: Invalid application index. Please provide a number between 1 and 2
+____________________________________________________________
+____________________________________________________________
+Error: Index and salary must be valid numerical values.
+____________________________________________________________
+____________________________________________________________
+Error: Salary cannot be negative.
+____________________________________________________________
+____________________________________________________________
+Error: Input cannot be empty. Please enter a command.
+____________________________________________________________
+____________________________________________________________
+Error: Invalid format. Usage: delete INDEX
+____________________________________________________________
+____________________________________________________________
+Error: The application index must be a number.
 ____________________________________________________________
 ____________________________________________________________
 Error: Invalid application index. Please provide a valid number.
 ____________________________________________________________
 ____________________________________________________________
-Here are your internship applications:
-1. Company: Google | Role: Software Engineer | Status: Interview | Contact Name: - | Contact Email: - | Deadlines: null
-2. Company: Apple | Role: Product Manager | Status: Applied | Contact Name: - | Contact Email: - | Deadlines: null
+Error: Input cannot be empty. Please enter a command.
 ____________________________________________________________
 ____________________________________________________________
 Are you sure you want to clear all data? Type 'yes' to confirm:
 Clear command cancelled.
 ____________________________________________________________
 ____________________________________________________________
-Are you sure you want to clear all data? Type 'yes' to confirm:
-All data has been cleared.
+Error: I'm sorry, but I don't know what that command means :-(
 ____________________________________________________________
 ____________________________________________________________
-No applications found. Start adding some!
+Error: Input cannot be empty. Please enter a command.
 ____________________________________________________________
 ____________________________________________________________
 Bye! Good luck with your internship hunt.

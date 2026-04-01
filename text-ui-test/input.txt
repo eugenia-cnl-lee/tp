@@ -1,26 +1,46 @@
 add c/Google r/Software Engineer
 add c/Meta r/Data Scientist
-add c/Apple r/Product Manager
+
+gibberish command
+
+add
+add c/Apple
+add r/Product Manager
 add c/Google r/Software Engineer
-list
-find Google
-find Product
-find NonExistent
-status 1 s/interview
-status 2 s/Ghosted
-status 99 s/Offered
-filter s/interview
+
+find
+
+status
+status 1
+status abc s/Interview
+status 99 s/Interview
+status 1 s/Ghosted
+
+filter
+filter Ghosted
 filter s/Ghosted
-filter clear
-deadline 1 type/Technical Interview d/2026-05-01
-deadline 99 type/Final d/2026-06-01
-overview
-delete 2
+
+deadline
+deadline add
+deadline add abc t/OA d/12-12-2026
+deadline add 99 t/OA d/12-12-2026
+deadline add 1 t/OA
+deadline add 1 d/12-12-2026
+deadline add 1 t/OA d/tomorrow
+
+offer
+offer 1
+offer abc s/5000
+offer 99 s/5000
+offer 1 s/five-thousand
+offer 1 s/-500
+
+delete
+delete abc
 delete 99
-list
+
 clear
+idk
 no
-clear
-yes
-list
+
 exit

@@ -19,6 +19,7 @@ public class Application {
     private DeadlineList deadlines;
     private String contactName;
     private String contactEmail;
+    private Double salary; // null if no salary/offer details are available
 
     /**
      * Constructs an Application with the given company and role.
@@ -34,6 +35,7 @@ public class Application {
         this.status = "Applied";
         this.contactName = null;
         this.contactEmail = null;
+        this.salary = null;
         this.deadlines = new DeadlineList();
         logger.fine("Created application: " + company + " | " + role);
     }
@@ -54,6 +56,7 @@ public class Application {
         this.status = status;
         this.contactName = null;
         this.contactEmail = null;
+        this.salary = null;
         this.deadlines = new DeadlineList();
         logger.fine("Created application: " + company + " | " + role + " | " + status);
     }
@@ -75,6 +78,7 @@ public class Application {
         this.status = status;
         this.contactName = contactName;
         this.contactEmail = null;
+        this.salary = null;
         this.deadlines = new DeadlineList();
         logger.fine("Created application with contact name: " + company +
                 " | " + role +
@@ -100,6 +104,7 @@ public class Application {
         this.status = status;
         this.contactName = contactName;
         this.contactEmail = contactEmail;
+        this.salary = null;
         this.deadlines = new DeadlineList();
         logger.fine("Created application with contact name and contact email: " + company +
                 " | " + role +
@@ -128,6 +133,7 @@ public class Application {
         this.status = status;
         this.contactName = contactName;
         this.contactEmail = contactEmail;
+        this.salary = null;
         this.deadlines = deadlines;
         logger.fine("Created application with deadlines: " + company +
                 " | " + role +
@@ -237,6 +243,24 @@ public class Application {
     }
 
     /**
+     * Gets the offered salary of this application.
+     *
+     * @return The salary amount, or null if no salary has been offered/recorded yet.
+     */
+    public Double getSalary() {
+        return salary;
+    }
+
+    /**
+     * Sets the offered salary for this application.
+     *
+     * @param salary The salary amount to record.
+     */
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+
+    /**
      * Returns the deadlines of this application.
      *
      * @return The deadlines.
@@ -261,13 +285,15 @@ public class Application {
      */
     @Override
     public String toString() {
-        String contactName = (this.contactName == null) ? "-" : this.contactName;
-        String contactEmail = (this.contactEmail == null) ? "-" : this.contactEmail;
+        String contactNameStr = (this.contactName == null) ? "-" : this.contactName;
+        String contactEmailStr = (this.contactEmail == null) ? "-" : this.contactEmail;
+        String salaryStr = (this.salary == null) ? "-" : String.format("$%.2f", this.salary);
         return "Company: " + company +
                 " | Role: " + role +
                 " | Status: " + status +
-                " | Contact Name: " + contactName +
-                " | Contact Email: " + contactEmail +
+                " | Salary: " + salaryStr +
+                " | Contact Name: " + contactNameStr +
+                " | Contact Email: " + contactEmailStr +
                 " | Deadlines: " + deadlines;
     }
 
@@ -282,7 +308,8 @@ public class Application {
                 .append(role).append(" | ")
                 .append(status).append(" | ")
                 .append(contactName == null ? "-" : contactName).append(" | ")
-                .append(contactEmail == null ? "-" : contactEmail);
+                .append(contactEmail == null ? "-" : contactEmail).append(" | ")
+                .append(salary == null ? "-" : salary);
 
         if (deadlines != null && deadlines.getSize() > 0) {
             for (Deadline deadline : deadlines.getDeadlines()) {
