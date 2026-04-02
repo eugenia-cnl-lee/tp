@@ -7,8 +7,10 @@ import seedu.interntrackr.model.ApplicationList;
 import seedu.interntrackr.storage.Storage;
 import seedu.interntrackr.ui.Ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -27,6 +29,18 @@ public class ArchiveCommandTest {
         @Override
         public void save(List<Application> applications) throws InternTrackrException {
             // No-op: suppress disk I/O during tests
+        }
+    }
+
+    /**
+     * A stub UI that captures messages for verification.
+     */
+    private static class StubUi extends Ui {
+        public final List<String> printedMessages = new ArrayList<>();
+
+        @Override
+        public void showMessage(String message) {
+            printedMessages.add(message);
         }
     }
 
@@ -85,6 +99,30 @@ public class ArchiveCommandTest {
 
         assertThrows(AssertionError.class,
                 () -> new ArchiveCommand(1).execute(applications, null, new StubStorage()));
+    }
+
+
+    @Test
+    public void execute_validIndex_showsSuccessMessage() throws InternTrackrException {
+        ApplicationList applications = new ApplicationList();
+        applications.addApplication(new Application("Google", "SWE"));
+        StubUi ui = new StubUi();
+
+        new ArchiveCommand(1).execute(applications, ui, new StubStorage());
+
+        assertEquals(3, ui.printedMessages.size());
+        assertEquals("Got it. I've archived this application:", ui.printedMessages.get(0));
+        assertTrue(ui.printedMessages.get(1).contains("Google"));
+        assertTrue(ui.printedMessages.get(2).contains("list archive"));
+    }
+
+    @Test
+    public void execute_nullStorage_throwsAssertionError() {
+        ApplicationList applications = new ApplicationList();
+        applications.addApplication(new Application("Google", "SWE"));
+
+        assertThrows(AssertionError.class,
+                () -> new ArchiveCommand(1).execute(applications, new Ui(), null));
     }
 
     @Test
