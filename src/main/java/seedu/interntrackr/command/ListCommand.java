@@ -35,6 +35,9 @@ public class ListCommand extends Command {
         for (int i = 1; i <= applications.getSize(); i++) {
             Application app = applications.getApplication(i);
             ui.showMessage(i + ". " + app.toString());
+            if (app.getNote() != null && !app.getNote().isBlank()) {
+                ui.showMessage("   Note: " + app.getNote());
+            }
         }
         logger.fine("Listed " + applications.getSize() + " applications successfully.");
     }
