@@ -76,14 +76,46 @@ public class ArchiveCommandTest {
     }
 
     @Test
-    public void execute_alreadyArchived_throwsInternTrackrException() throws InternTrackrException {
+    public void execute_alreadyArchivedEntry_notReachableByDisplayIndex() throws InternTrackrException {
+        // If an application is already archived it is invisible in `list`,
+        // so display index 1 should resolve to the first *active* entry, not the archived one.
         ApplicationList applications = new ApplicationList();
-        Application app = new Application("Google", "SWE");
-        app.setArchived(true);
-        applications.addApplication(app);
+        Application alreadyArchived = new Application("OldCo", "Role");
+        alreadyArchived.setArchived(true);
+        applications.addApplication(alreadyArchived);
+        Application active = new Application("Google", "SWE");
+        applications.addApplication(active);
 
-        assertThrows(InternTrackrException.class,
-                () -> new ArchiveCommand(1).execute(applications, new Ui(), new StubStorage()));
+        // Display index 1 must target "Google", not "OldCo"
+        new ArchiveCommand(1).execute(applications, new Ui(), new StubStorage());
+
+        assertTrue(active.isArchived());
+        // The backing-list position of OldCo is 1; it must still be archived (unchanged)
+        assertTrue(alreadyArchived.isArchived());
+    }
+
+    /**
+     * Verifies that when the first slot in the backing list is archived, display index 1
+     * correctly resolves to the second backing-list entry (the first active one).
+     * This is the core regression test for the index-offset bug.
+     */
+    @Test
+    public void execute_displayIndexWithOffsetFromArchivedSlots_archivesCorrectEntry()
+            throws InternTrackrException {
+        ApplicationList applications = new ApplicationList();
+        Application archivedFirst = new Application("ArchivedCo", "OldRole");
+        archivedFirst.setArchived(true);
+        applications.addApplication(archivedFirst);           // backing index 1 — archived
+        Application shouldBeArchived = new Application("ActiveCo", "NewRole");
+        applications.addApplication(shouldBeArchived);        // backing index 2 — active, display index 1
+
+        // User types `archive 1`: should target "ActiveCo" (display 1), not "ArchivedCo" (backing 1)
+        new ArchiveCommand(1).execute(applications, new Ui(), new StubStorage());
+
+        assertTrue(shouldBeArchived.isArchived(),
+                "Display index 1 should archive the first active entry (ActiveCo)");
+        // ArchivedCo must remain archived but not be double-touched
+        assertTrue(archivedFirst.isArchived());
     }
 
     @Test

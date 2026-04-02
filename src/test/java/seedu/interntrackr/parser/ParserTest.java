@@ -24,6 +24,16 @@ public class ParserTest {
     }
 
     @Test
+    public void parse_listArchiveCommandUpperCase_returnsListArchiveCommand() throws InternTrackrException {
+        assertTrue(Parser.parse("list ARCHIVE") instanceof ListArchiveCommand);
+    }
+
+    @Test
+    public void parse_listArchiveCommandMixedCase_returnsListArchiveCommand() throws InternTrackrException {
+        assertTrue(Parser.parse("list Archive") instanceof ListArchiveCommand);
+    }
+
+    @Test
     public void parse_archiveCommand_returnsArchiveCommand() throws InternTrackrException {
         assertTrue(Parser.parse("archive 1") instanceof seedu.interntrackr.command.ArchiveCommand);
     }
