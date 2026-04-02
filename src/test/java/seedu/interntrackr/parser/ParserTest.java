@@ -42,3 +42,4 @@ public class ParserTest {
         assertTrue(Parser.parse("contact 1 c/Jane Tan e/jane@example.com") instanceof ContactCommand);
     }
 }
+

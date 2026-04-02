@@ -40,7 +40,12 @@ public class OverviewCommand extends Command {
         if (size == 0) {
             ui.showMessage("You haven't tracked any applications yet. Start adding some!");
         } else {
-            ui.showMessage("You are currently tracking " + size + " application(s).");
+            long activeCount = applications.getApplications().stream()
+                    .filter(app -> !app.isArchived()).count();
+            long archivedCount = size - activeCount;
+
+            ui.showMessage("You are currently tracking " + size + " application(s) in total"
+                    + " (" + activeCount + " active, " + archivedCount + " archived).");
 
             Map<String, Integer> statusCounts = new LinkedHashMap<>();
             for (String validStatus : Application.VALID_STATUSES) {
@@ -48,15 +53,22 @@ public class OverviewCommand extends Command {
             }
 
             for (Application app : applications.getApplications()) {
-                String currentStatus = app.getStatus();
-                statusCounts.put(currentStatus, statusCounts.getOrDefault(currentStatus, 0) + 1);
+                if (!app.isArchived()) {
+                    String currentStatus = app.getStatus();
+                    statusCounts.put(currentStatus, statusCounts.getOrDefault(currentStatus, 0) + 1);
+                }
             }
 
-            ui.showMessage("Status Breakdown:");
+            ui.showMessage("Active status breakdown:");
+            boolean anyActive = false;
             for (Map.Entry<String, Integer> entry : statusCounts.entrySet()) {
                 if (entry.getValue() > 0) {
                     ui.showMessage(" - " + entry.getKey() + ": " + entry.getValue());
+                    anyActive = true;
                 }
+            }
+            if (!anyActive) {
+                ui.showMessage(" - No active applications.");
             }
             ui.showMessage("Keep up the momentum!");
         }

@@ -142,6 +142,70 @@ class StorageTest {
         assertThrows(InternTrackrException.class, storage::load);
     }
 
+    /**
+     * Verifies that an archived application is saved with the archived flag
+     * and reloaded with isArchived restored to true.
+     */
+    @Test
+    void saveAndLoad_archivedApplication_preservesArchivedFlag() throws InternTrackrException {
+        Storage storage = new Storage(getTempFilePath());
+
+        Application app = new Application("Google", "SWE Intern", "Rejected",
+                "Sam Lee", "sam@google.com");
+        app.setArchived(true);
+
+        ArrayList<Application> toSave = new ArrayList<>();
+        toSave.add(app);
+
+        storage.save(toSave);
+        ArrayList<Application> loaded = storage.load();
+
+        assertEquals(1, loaded.size());
+        assertTrue(loaded.get(0).isArchived());
+        assertEquals("Google", loaded.get(0).getCompany());
+    }
+
+    /**
+     * Verifies that a non-archived application is reloaded with isArchived as false.
+     */
+    @Test
+    void saveAndLoad_nonArchivedApplication_isArchivedFalse() throws InternTrackrException {
+        Storage storage = new Storage(getTempFilePath());
+
+        ArrayList<Application> toSave = new ArrayList<>();
+        toSave.add(new Application("Grab", "Frontend Intern", "Applied", "-", "-"));
+
+        storage.save(toSave);
+        ArrayList<Application> loaded = storage.load();
+
+        assertEquals(1, loaded.size());
+        org.junit.jupiter.api.Assertions.assertFalse(loaded.get(0).isArchived());
+    }
+
+    /**
+     * Verifies that a mix of archived and non-archived applications are saved and
+     * reloaded with their respective flags intact.
+     */
+    @Test
+    void saveAndLoad_mixedArchivedAndNonArchived_preservesAllFlags() throws InternTrackrException {
+        Storage storage = new Storage(getTempFilePath());
+
+        Application active = new Application("Shopee", "Backend Intern", "Applied", "-", "-");
+        Application archived = new Application("TikTok", "Data Intern", "Rejected", "-", "-");
+        archived.setArchived(true);
+
+        ArrayList<Application> toSave = new ArrayList<>();
+        toSave.add(active);
+        toSave.add(archived);
+
+        storage.save(toSave);
+        ArrayList<Application> loaded = storage.load();
+
+        assertEquals(2, loaded.size());
+        org.junit.jupiter.api.Assertions.assertFalse(loaded.get(0).isArchived());
+        assertTrue(loaded.get(1).isArchived());
+    }
+
     @Test
     void save_createsFileIfNotExists() throws InternTrackrException {
         String path = System.getProperty("java.io.tmpdir") + "/newfile_test.txt";
