@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import seedu.interntrackr.command.Command;
 import seedu.interntrackr.command.ClearCommand;
 import seedu.interntrackr.command.ExitCommand;
+import seedu.interntrackr.command.HelpCommand;
 import seedu.interntrackr.command.ListCommand;
 import seedu.interntrackr.command.OverviewCommand;
 import seedu.interntrackr.exception.InternTrackrException;
@@ -57,6 +58,9 @@ public class Parser {
             return NoteCommandParser.parse(arguments);
         case "archive":
             return ArchiveCommandParser.parse(arguments);
+        case "help":
+            logger.fine("Parsed: HelpCommand");
+            return new HelpCommand();
         case "clear":
             return new ClearCommand();
         case "overview":
