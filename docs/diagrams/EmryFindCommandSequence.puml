@@ -1,0 +1,41 @@
+@startuml
+skinparam Style strictuml
+box "Logic" #LightBlue
+participant ":Parser" as Parser
+participant ":FindCommandParser" as FindCommandParser
+participant "f:FindCommand" as FindCommand
+end box
+
+box "Model" #LightYellow
+participant ":ApplicationList" as ApplicationList
+end box
+
+[-> Parser : parseCommand("find Shopee")
+activate Parser
+
+Parser -> FindCommandParser : parse("Shopee")
+activate FindCommandParser
+
+create FindCommand
+FindCommandParser -> FindCommand : FindCommand("Shopee")
+activate FindCommand
+FindCommand --> FindCommandParser : f
+deactivate FindCommand
+
+FindCommandParser --> Parser : f
+deactivate FindCommandParser
+
+[<- Parser : f
+deactivate Parser
+
+[-> FindCommand : execute()
+activate FindCommand
+
+FindCommand -> ApplicationList : findApplications("Shopee")
+activate ApplicationList
+ApplicationList --> FindCommand : filteredList
+deactivate ApplicationList
+
+[<- FindCommand : result
+deactivate FindCommand
+@enduml
