@@ -21,8 +21,8 @@ public class OverviewCommand extends Command {
      * and a breakdown of their current statuses.
      *
      * @param applications The current list of applications; must not be null.
-     * @param ui           The UI used to display output; must not be null.
-     * @param storage      Not used by this command; may be null.
+     * @param ui The UI used to display output; must not be null.
+     * @param storage Not used by this command; may be null.
      * @throws InternTrackrException Not thrown by this command, declared for interface compliance.
      */
     @Override
@@ -59,7 +59,7 @@ public class OverviewCommand extends Command {
                 }
             }
 
-            ui.showMessage("Active status breakdown:");
+            ui.showMessage("Status Breakdown:");
             boolean anyActive = false;
             for (Map.Entry<String, Integer> entry : statusCounts.entrySet()) {
                 if (entry.getValue() > 0) {
