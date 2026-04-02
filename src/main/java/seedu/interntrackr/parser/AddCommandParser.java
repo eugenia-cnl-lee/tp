@@ -24,7 +24,11 @@ public class AddCommandParser {
     public static AddCommand parse(String arguments) throws InternTrackrException {
         assert arguments != null : "arguments must not be null";
 
-        if (!arguments.contains(PREFIX_COMPANY) || !arguments.contains(PREFIX_ROLE)) {
+        String paddedArgs = " " + arguments;
+        String searchCompany = " " + PREFIX_COMPANY;
+        String searchRole = " " + PREFIX_ROLE;
+
+        if (!paddedArgs.contains(searchCompany) || !paddedArgs.contains(searchRole)) {
             logger.warning("Add command missing c/ or r/ parameter.");
             throw new InternTrackrException("Invalid format. Usage: add c/COMPANY r/ROLE");
         }
@@ -35,15 +39,15 @@ public class AddCommandParser {
         String role;
 
         try {
-            int cIndex = arguments.indexOf(PREFIX_COMPANY);
-            int rIndex = arguments.indexOf(PREFIX_ROLE);
+            int cIndex = paddedArgs.indexOf(searchCompany);
+            int rIndex = paddedArgs.indexOf(searchRole);
 
             if (cIndex < rIndex) {
-                company = arguments.substring(cIndex + PREFIX_COMPANY.length(), rIndex).trim().replace("\"", "");
-                role = arguments.substring(rIndex + PREFIX_ROLE.length()).trim().replace("\"", "");
+                company = paddedArgs.substring(cIndex + searchCompany.length(), rIndex).trim().replace("\"", "");
+                role = paddedArgs.substring(rIndex + searchRole.length()).trim().replace("\"", "");
             } else {
-                role = arguments.substring(rIndex + PREFIX_ROLE.length(), cIndex).trim().replace("\"", "");
-                company = arguments.substring(cIndex + PREFIX_COMPANY.length()).trim().replace("\"", "");
+                role = paddedArgs.substring(rIndex + searchRole.length(), cIndex).trim().replace("\"", "");
+                company = paddedArgs.substring(cIndex + searchCompany.length()).trim().replace("\"", "");
             }
 
             if (company.isEmpty() || role.isEmpty()) {
