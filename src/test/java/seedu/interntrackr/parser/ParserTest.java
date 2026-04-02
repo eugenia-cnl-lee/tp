@@ -48,6 +48,22 @@ public class ParserTest {
         assertThrows(InternTrackrException.class, () -> Parser.parse("   "));
     }
 
+
+    @Test
+    public void parse_listWithExtraArguments_throwsInternTrackrException() {
+        assertThrows(InternTrackrException.class, () -> Parser.parse("list archive extra"));
+    }
+
+    @Test
+    public void parse_listWithUnknownSubcommand_throwsInternTrackrException() {
+        assertThrows(InternTrackrException.class, () -> Parser.parse("list archived"));
+    }
+
+    @Test
+    public void parse_archiveWithoutIndex_throwsInternTrackrException() {
+        assertThrows(InternTrackrException.class, () -> Parser.parse("archive"));
+    }
+
     @Test
     void parse_contactCommand_success() throws Exception {
         assertTrue(Parser.parse("contact 1 c/Jane Tan e/jane@example.com") instanceof ContactCommand);

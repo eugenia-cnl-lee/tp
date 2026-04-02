@@ -68,12 +68,16 @@ public class Parser {
             logger.fine("Parsed: OverviewCommand");
             return new OverviewCommand();
         case "list":
+            if (arguments.isEmpty()) {
+                logger.fine("Parsed: ListCommand");
+                return new ListCommand();
+            }
             if ("archive".equals(arguments)) {
                 logger.fine("Parsed: ListArchiveCommand");
                 return new ListArchiveCommand();
             }
-            logger.fine("Parsed: ListCommand");
-            return new ListCommand();
+            logger.warning("Invalid list arguments: \"" + arguments + "\"");
+            throw new InternTrackrException("Invalid format. Usage: list OR list archive");
         case "exit":
             logger.fine("Parsed: ExitCommand");
             return new ExitCommand();
