@@ -1,36 +1,25 @@
 @startuml
 actor User
-participant ":Ui" as UI
-participant ":InternTrackr" as IT
 participant ":Parser" as P
-participant ":AddCommandParser" as ACP
-participant ":DeleteCommandParser" as DCP
-participant ":ArchiveCommandParser" as ArCP
+participant ":XYZCommandParser" as XCP
 
-User -> UI : types command
-IT -> UI : readCommand()
-UI --> IT : fullCommand
+User -> P : parse(fullCommand)
+note right of P
+  Rejects blank input and
+  input containing "|"
+end note
 
-IT -> P : parse(fullCommand)
-
-alt command word is "add"
-    P -> ACP : parse(arguments)
-    ACP --> P : c (AddCommand)
-else command word is "delete"
-    P -> DCP : parse(arguments)
-    DCP --> P : c (DeleteCommand)
-else command word is "archive"
-    P -> ArCP : parse(arguments)
-    ArCP --> P : c (ArchiveCommand)
-else command is "list archive"
-    note right of P
-      Handled directly in Parser.
-      No separate ListArchiveCommandParser exists.
-    end note
-    P --> IT : c (ListArchiveCommand)
-else command is "list"
-    P --> IT : c (ListCommand)
+alt command needs argument parsing (add, delete, archive, ...)
+    P -> XCP : parse(arguments)
+    XCP --> P : command
+else simple command (list, list archive, overview, ...)
+    note right of P : Command created directly
 end
 
-P --> IT : command
+P --> User : command
+note right of P
+  Diagram simplified.
+  Each command routes to its
+  own XYZCommandParser class.
+end note
 @enduml

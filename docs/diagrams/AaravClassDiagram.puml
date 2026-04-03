@@ -1,0 +1,46 @@
+@startuml
+abstract class Command {
+    +execute(...)
+}
+
+class AddCommand
+class DeleteCommand
+class ArchiveCommand
+class ListArchiveCommand
+
+class Parser {
+    +{static} parse(fullCommand): Command
+}
+
+class AddCommandParser
+class DeleteCommandParser
+class ArchiveCommandParser
+
+class ApplicationList {
+    +getActiveApplication(index)
+    +hasApplication(app)
+    +countActive()
+}
+
+class Application {
+    -isArchived: boolean
+    +isArchived(): boolean
+    +setArchived(boolean)
+}
+
+Command <|-- AddCommand
+Command <|-- DeleteCommand
+Command <|-- ArchiveCommand
+Command <|-- ListArchiveCommand
+
+Parser ..> AddCommandParser : delegates to
+Parser ..> DeleteCommandParser : delegates to
+Parser ..> ArchiveCommandParser : delegates to
+
+AddCommand ..> ApplicationList
+DeleteCommand ..> ApplicationList
+ArchiveCommand ..> ApplicationList
+ListArchiveCommand ..> ApplicationList
+
+ApplicationList "1" *-- "0..*" Application
+@enduml
