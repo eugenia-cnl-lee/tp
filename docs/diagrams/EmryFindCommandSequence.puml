@@ -1,41 +1,61 @@
 @startuml
-skinparam Style strictuml
-box "Logic" #LightBlue
-participant ":Parser" as Parser
-participant ":FindCommandParser" as FindCommandParser
-participant "f:FindCommand" as FindCommand
-end box
+actor User
+participant ":InternTrackr" as IT
+participant ":Parser" as P
+participant "c:FindCommand" as FC
+participant ":ApplicationList" as AL
+participant "app:Application" as App
+participant ":Ui" as UI
 
-box "Model" #LightYellow
-participant ":ApplicationList" as ApplicationList
-end box
+User -> IT : "find Shopee"
+activate IT
+IT -> P : parseCommand("find Shopee")
+activate P
 
-[-> Parser : parseCommand("find Shopee")
-activate Parser
+create FC
+P -> FC : FindCommand("Shopee")
+activate FC
+FC --> P : c
+deactivate FC
 
-Parser -> FindCommandParser : parse("Shopee")
-activate FindCommandParser
+P --> IT : c
+deactivate P
 
-create FindCommand
-FindCommandParser -> FindCommand : FindCommand("Shopee")
-activate FindCommand
-FindCommand --> FindCommandParser : f
-deactivate FindCommand
+IT -> FC : execute(applications, ui, storage)
+activate FC
 
-FindCommandParser --> Parser : f
-deactivate FindCommandParser
+FC -> AL : getSize()
+activate AL
+AL --> FC : size
+deactivate AL
 
-[<- Parser : f
-deactivate Parser
+loop for each application (1 to size)
+    FC -> AL : getApplication(i)
+    activate AL
+    AL --> FC : app
+    deactivate AL
 
-[-> FindCommand : execute()
-activate FindCommand
+    FC -> App : isArchived()
+    activate App
+    App --> FC : false
+    deactivate App
 
-FindCommand -> ApplicationList : findApplications("Shopee")
-activate ApplicationList
-ApplicationList --> FindCommand : filteredList
-deactivate ApplicationList
+    alt application contains keyword
+        FC -> UI : showMessage(...)
+        activate UI
+        UI --> FC
+        deactivate UI
+    end
+end
 
-[<- FindCommand : result
-deactivate FindCommand
+alt no matches found
+    FC -> UI : showMessage("No matching applications found.")
+    activate UI
+    UI --> FC
+    deactivate UI
+end
+
+deactivate FC
+IT --> User
+deactivate IT
 @enduml
