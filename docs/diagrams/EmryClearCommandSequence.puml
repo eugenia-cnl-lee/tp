@@ -1,39 +1,49 @@
 @startuml
-skinparam Style strictuml
-box "Logic" #LightBlue
-participant "c:ClearCommand" as ClearCommand
-end box
+actor User
+participant ":InternTrackr" as IT
+participant "c:ClearCommand" as CC
+participant ":Ui" as UI
+participant ":ApplicationList" as AL
+participant ":Storage" as ST
 
-box "UI" #LightPink
-participant ":Ui" as Ui
-end box
+User -> IT : "clear"
+activate IT
+IT -> CC : execute(applications, ui, storage)
+activate CC
 
-box "Model" #LightYellow
-participant ":ApplicationList" as ApplicationList
-participant ":Storage" as Storage
-end box
+CC -> UI : showMessage("Are you sure...")
+activate UI
+UI --> CC
+deactivate UI
 
-[-> ClearCommand : execute()
-activate ClearCommand
+CC -> UI : readCommand()
+activate UI
+UI --> CC : "yes"
+deactivate UI
 
-ClearCommand -> Ui : readCommand()
-activate Ui
-note right: User is prompted to type 'yes'
-Ui --> ClearCommand : "yes"
-deactivate Ui
+alt response.equalsIgnoreCase("yes")
+    CC -> AL : clear()
+    activate AL
+    AL --> CC
+    deactivate AL
 
-opt user input is "yes"
-    ClearCommand -> ApplicationList : clearApplications()
-    activate ApplicationList
-    ApplicationList --> ClearCommand
-    deactivate ApplicationList
+    CC -> AL : getApplications()
+    activate AL
+    AL --> CC : list
+    deactivate AL
 
-    ClearCommand -> Storage : save(applicationList)
-    activate Storage
-    Storage --> ClearCommand
-    deactivate Storage
+    CC -> ST : save(list)
+    activate ST
+    ST --> CC
+    deactivate ST
+
+    CC -> UI : showMessage("All data has been cleared.")
+    activate UI
+    UI --> CC
+    deactivate UI
 end
 
-[<- ClearCommand : success message
-deactivate ClearCommand
+deactivate CC
+IT --> User
+deactivate IT
 @enduml
