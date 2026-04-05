@@ -1,0 +1,34 @@
+@startuml
+participant ":InternTrackr" as IT
+participant ":Parser" as P
+participant ":FilterCommandParser" as FCP
+participant "c:FilterCommand" as FC
+
+[-> IT : "filter Applied"
+activate IT
+
+IT -> P : parseCommand("filter Applied")
+activate P
+
+P -> FCP : parse("Applied")
+activate FCP
+
+create FC
+FCP -> FC : FilterCommand("Applied")
+activate FC
+FC --> FCP
+deactivate FC
+
+FCP --> P : c
+deactivate FCP
+
+P --> IT : c
+deactivate P
+
+note right of IT: The returned command 'c' is then executed.
+
+ref over IT, FC : Filter Command Execution (see Execution Diagram)
+
+[<-- IT
+deactivate IT
+@enduml

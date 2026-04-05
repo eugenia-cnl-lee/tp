@@ -1,28 +1,46 @@
 @startuml
 hide footbox
-participant ":Parser" as P
-participant ":FilterCommandParser" as FCP
-participant "f:FilterCommand" as FC
-
-[-> P : parseCommand("filter Applied")
-activate P
-P -> FCP : parse("Applied")
-activate FCP
-
-create FC
-FCP -> FC : FilterCommand("Applied")
-activate FC
-FC --> FCP : f
-deactivate FC
-
-FCP --> P : f
-deactivate FCP
-[<-- P : f
-deactivate P
+participant ":FilterCommand" as FC
+participant "<<class>>\n:Application" as AppClass
+participant "app:Application" as App
+participant ":ApplicationList" as AL
 
 [-> FC : execute()
 activate FC
-note right: Logic to loop through ApplicationList\nand filter by status
+
+FC -> AppClass : isValidStatus(status)
+activate AppClass
+AppClass --> FC : isValid
+deactivate AppClass
+
+FC -> AppClass : getNormalizedStatus(status)
+activate AppClass
+AppClass --> FC : normalizedStatus
+deactivate AppClass
+
+loop for each application in ApplicationList
+    FC -> AL : getApplication(i)
+    activate AL
+    AL --> FC : app
+    deactivate AL
+
+    FC -> App : isArchived()
+    activate App
+    App --> FC : isArchived
+    deactivate App
+
+    note right: Only non-archived apps are checked
+
+    FC -> App : getStatus()
+    activate App
+    App --> FC : appStatus
+    deactivate App
+
+    alt appStatus == normalizedStatus
+        note right: Display matching application
+    end
+end
+
 [<-- FC
 deactivate FC
 @enduml

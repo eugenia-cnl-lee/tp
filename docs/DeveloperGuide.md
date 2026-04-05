@@ -401,20 +401,30 @@ The `FilterCommandParser#parse()` method handles the initial input processing:
 3.  **Prefix Validation**: Ensures status-based filters start with the `s/` prefix.
 4.  **Cleaning**: Extracts the status string, removes any accidental quotation marks, and trims whitespace before passing it to the command constructor.
 
+
+**Transition to Execution**
+The FilterCommandParser acts as a factory that translates raw user input into a configured FilterCommand object.
+This object encapsulates the validated status string (or the isClear flag), which is then passed to the main execution loop.
+This separation ensures that the FilterCommand itself does not need to know about the s/ prefix or raw string splitting, focusing purely on the filtering logic.
+
 **1.1.2 Execution Logic**
 When `FilterCommand#execute()` is called, it performs the following steps:
-1.  **Branching**: If the `isClear` flag is active, it immediately calls `handleClearFilter()` to print every application in the list.
-2.  **Validation**: For status filters, it queries `Application#isValidStatus()` to ensure the input matches one of the recognized categories: `Applied`, `Pending`, `Interview`, `Offered`, `Rejected`, or `Accepted`.
+1.  **Branching**: If the `isClear` flag is active, it calls `handleClearFilter()` to display all non-archived applications.
+2.  **Validation**: For status filters, it delegates verification to `Application#isValidStatus()` to ensure the input matches a recognized category: `Applied`, `Pending`, `Interview`, `Offered`, `Rejected`, or `Accepted`.
 3.  **Normalization**: It retrieves the "canonical" version of the status (e.g., "iNtErViEw" becomes "Interview") via `Application#getNormalizedStatus()` to ensure a successful match.
-4.  **Iteration**: It loops through the `ApplicationList` using a 1-based index.
-5.  **Matching**: For each application, it compares the current status with the search term. If they match, the application is passed to the `Ui` for display.
-6.  **Edge Case Handling**: If the loop completes and the `matchCount` is zero, it informs the user that no applications currently hold that status.
+4.  **Iteration & Archival Check**: It loops through the `ApplicationList`, first calling `Application#isArchived()` to skip any hidden entries.
+5.  **Matching**: For each application, it retrieves the current status via `Application#getStatus()` and compares it with the normalized search term. If they match, the application and its current display index are passed to the `Ui` for display.
+6.  **Display**: Matching applications are passed to the Ui along with their current display index.
+7.  **Edge Case Handling**: If the loop completes and the `matchCount` is zero, it informs the user via `Ui`.
 
 #### 1.2 Sequence Diagrams
 
-The diagram below shows the interaction when a user inputs a filter command:
+The diagram below illustrates the end-to-end interaction from user input to result display. It specifically highlights how `FilterCommand` interacts with the `Application` class to perform static validation and normalization before iterating through the `ApplicationList`.
+
+The following diagram details the internal logic within the `execute()` method, with the loop and the conditional checks for archived states and status matches.
 
 ![Filter Parsing Sequence Diagram](images/EmryFilterCommandSequence.png)
+![FilterCommandParser Sequence Diagram](images/EmryFilterParserSequence.png)
 
 The diagram below shows the internal logic of the `FilterCommand` during execution:
 
@@ -428,6 +438,10 @@ The diagram below shows the internal logic of the `FilterCommand` during executi
   * *Cons*: If a user types `filter s/applied` but the data is stored as `Applied`, they get zero results, which is counter-intuitive.
 * **Alternative 2 (Current Choice)**: Normalize both the input and the comparison target to Title Case.
   * *Reasoning*: This provides a "Search-like" experience where the user does not need to remember exact capitalization, reducing friction.
+
+**Aspect: Filtering Archived Applications**
+* **Choice**: Exclude archived applications from the `filter` results.
+  * *Reasoning*: This maintains consistency with the default `list` view. Users typically filter to find active tasks; historical data is kept separate in the `list archive` view to avoid cluttering the primary search results.
 
 ---
 
