@@ -29,6 +29,12 @@ public class StatusCommandParser {
         String[] statusArgs = arguments.split(PREFIX_STATUS, 2);
         try {
             int index = Integer.parseInt(statusArgs[0].trim());
+
+            if (index <= 0) {
+                logger.warning("Status command index is non-positive: " + index);
+                throw new InternTrackrException("Application index must be a positive integer.");
+            }
+
             String parsedStatus = statusArgs[1].replace("\"", "").trim();
             logger.fine("Parsed: StatusCommand index=" + index + " status=" + parsedStatus);
             return new StatusCommand(index, parsedStatus);
