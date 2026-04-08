@@ -151,8 +151,8 @@ Error: Invalid application index.
 ____________________________________________________________
 ____________________________________________________________
 Error: Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]
-Error: Invalid format. Usage: deadline done INDEX i/DEADLINE_INDEX
-Error: Invalid format. Usage: deadline list INDEX
+Invalid format. Usage: deadline done INDEX i/DEADLINE_INDEX
+Invalid format. Usage: deadline list INDEX
 ____________________________________________________________
 ____________________________________________________________
 Error: Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]
