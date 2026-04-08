@@ -66,6 +66,7 @@ archive 99
 archive 1
 archive 1
 list archive
+unarchive 1
 find Meta
 list
 delete 2
