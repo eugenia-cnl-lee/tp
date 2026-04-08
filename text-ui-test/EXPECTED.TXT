@@ -151,6 +151,8 @@ Error: Invalid application index.
 ____________________________________________________________
 ____________________________________________________________
 Error: Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]
+Invalid format. Usage: deadline done INDEX i/DEADLINE_INDEX
+Invalid format. Usage: deadline list INDEX
 ____________________________________________________________
 ____________________________________________________________
 Error: Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]
@@ -177,6 +179,31 @@ ____________________________________________________________
 Deadline updated! Google's Software Engineer's Technical Interview due date is now on the [2026-12-18]
 ____________________________________________________________
 ____________________________________________________________
+Error: Invalid format. Usage: deadline done INDEX i/DEADLINE_INDEX
+____________________________________________________________
+____________________________________________________________
+Error: The application index and deadline index must be numbers.
+____________________________________________________________
+____________________________________________________________
+Error: Invalid application index.
+____________________________________________________________
+____________________________________________________________
+Error: Invalid format. Usage: deadline done INDEX i/DEADLINE_INDEX
+____________________________________________________________
+____________________________________________________________
+Error: The application index and deadline index must be numbers.
+____________________________________________________________
+____________________________________________________________
+Error: Invalid deadline index.
+____________________________________________________________
+____________________________________________________________
+Nice! Marked this deadline as done:
+1. Deadline Type: Online Assessment | Due Date: 2026-12-12 | Done: [X]
+____________________________________________________________
+____________________________________________________________
+Error: This deadline has already been marked as done.
+____________________________________________________________
+____________________________________________________________
 Error: Invalid format. Usage: deadline list INDEX
 ____________________________________________________________
 ____________________________________________________________
@@ -187,7 +214,7 @@ Error: Invalid application index.
 ____________________________________________________________
 ____________________________________________________________
 Here are the deadlines for this application:
-1. Deadline Type: Online Assessment | Due Date: 2026-12-12 | Done: [ ]
+1. Deadline Type: Online Assessment | Due Date: 2026-12-12 | Done: [X]
 2. Deadline Type: Technical Interview | Due Date: 2026-12-18 | Done: [ ]
 ____________________________________________________________
 ____________________________________________________________
@@ -221,7 +248,7 @@ Error: Invalid application index. Please provide a number between 1 and 7.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've archived this application:
-  Company: Google | Role: Software Engineer | Status: Offered | Salary: $8500.50 | Contact Name: John Doe | Contact Email: john@google.com | Deadlines: [Deadline Type: Online Assessment | Due Date: 2026-12-12 | Done: [ ], Deadline Type: Technical Interview | Due Date: 2026-12-18 | Done: [ ]]
+  Company: Google | Role: Software Engineer | Status: Offered | Salary: $8500.50 | Contact Name: John Doe | Contact Email: john@google.com | Deadlines: [Deadline Type: Online Assessment | Due Date: 2026-12-12 | Done: [X], Deadline Type: Technical Interview | Due Date: 2026-12-18 | Done: [ ]]
 It will no longer appear in the default list. Use 'list archive' to view it.
 ____________________________________________________________
 ____________________________________________________________
@@ -231,7 +258,7 @@ It will no longer appear in the default list. Use 'list archive' to view it.
 ____________________________________________________________
 ____________________________________________________________
 Here are your archived internship applications:
-1. Company: Google | Role: Software Engineer | Status: Offered | Salary: $8500.50 | Contact Name: John Doe | Contact Email: john@google.com | Deadlines: [Deadline Type: Online Assessment | Due Date: 2026-12-12 | Done: [ ], Deadline Type: Technical Interview | Due Date: 2026-12-18 | Done: [ ]]
+1. Company: Google | Role: Software Engineer | Status: Offered | Salary: $8500.50 | Contact Name: John Doe | Contact Email: john@google.com | Deadlines: [Deadline Type: Online Assessment | Due Date: 2026-12-12 | Done: [X], Deadline Type: Technical Interview | Due Date: 2026-12-18 | Done: [ ]]
 2. Company: Meta | Role: Data Scientist | Status: Pending | Salary: - | Contact Name: - | Contact Email: - | Deadlines: null
 ____________________________________________________________
 ____________________________________________________________

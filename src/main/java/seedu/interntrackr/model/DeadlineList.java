@@ -49,6 +49,18 @@ public class DeadlineList {
     }
 
     /**
+     * Returns the deadline at the specified 1-based index.
+     *
+     * @param index The 1-based index of the deadline.
+     * @return The deadline at the given index.
+     * @throws IndexOutOfBoundsException If the index is out of range.
+     */
+    public Deadline getDeadline(int index) {
+        assert index > 0 && index <= deadlines.size() : "Deadline index out of bounds";
+        return deadlines.get(index - 1);
+    }
+
+    /**
      * Returns an unmodifiable view of all deadlines.
      *
      * @return An unmodifiable list of deadlines.

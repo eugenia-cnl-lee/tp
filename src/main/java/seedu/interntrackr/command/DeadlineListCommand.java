@@ -51,7 +51,7 @@ public class DeadlineListCommand extends Command {
         }
         ui.showMessage("Here are the deadlines for this application:");
         for (int i = 0; i < deadlines.getSize(); i++) {
-            ui.showMessage((i + 1) + ". " + deadlines.getDeadlines().get(i).toString());
+            ui.showMessage((i + 1) + ". " + deadlines.getDeadline(i + 1).toString());
         }
         logger.fine("Listed " + deadlines.getSize() + " deadlines successfully.");
     }

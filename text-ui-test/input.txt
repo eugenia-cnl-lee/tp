@@ -42,6 +42,14 @@ deadline add 1 d/12-12-2026
 deadline add 1 t/OA d/tomorrow
 deadline add 1 t/Online Assessment d/12-12-2026
 deadline add 1 t/Technical Interview d/18-12-2026 n/Review DP
+deadline done
+deadline done abc i/1
+deadline done 99 i/1
+deadline done 1
+deadline done 1 i/abc
+deadline done 1 i/99
+deadline done 1 i/1
+deadline done 1 i/1
 deadline list
 deadline list abc
 deadline list 99
