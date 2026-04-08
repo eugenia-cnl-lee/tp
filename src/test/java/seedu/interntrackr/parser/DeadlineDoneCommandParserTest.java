@@ -13,10 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class DeadlineDoneCommandParserTest {
 
     private static final String COMBINED_USAGE =
-            "Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]"
-                    + System.lineSeparator()
-                    + "Invalid format. Usage: deadline done INDEX i/DEADLINE_INDEX"
-                    + System.lineSeparator()
+            "Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]\\R"
+                    + "Invalid format. Usage: deadline done INDEX i/DEADLINE_INDEX\\R"
                     + "Invalid format. Usage: deadline list INDEX";
 
     private static final String DEADLINE_DONE_USAGE =

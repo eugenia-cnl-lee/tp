@@ -151,6 +151,8 @@ Error: Invalid application index.
 ____________________________________________________________
 ____________________________________________________________
 Error: Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]
+Error: Invalid format. Usage: deadline done INDEX i/DEADLINE_INDEX
+Error: Invalid format. Usage: deadline list INDEX
 ____________________________________________________________
 ____________________________________________________________
 Error: Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]
@@ -169,21 +171,6 @@ Error: Invalid format. Usage: deadline add INDEX t/TYPE d/DD-MM-YYYY [n/NOTES]
 ____________________________________________________________
 ____________________________________________________________
 Error: Invalid date format. Use DD-MM-YYYY.
-____________________________________________________________
-____________________________________________________________
-Deadline updated! Google's Software Engineer's Online Assessment due date is now on the [2026-12-12]
-____________________________________________________________
-____________________________________________________________
-Deadline updated! Google's Software Engineer's Technical Interview due date is now on the [2026-12-18]
-____________________________________________________________
-____________________________________________________________
-Error: Invalid format. Usage: deadline list INDEX
-____________________________________________________________
-____________________________________________________________
-Error: The application index must be a number.
-____________________________________________________________
-____________________________________________________________
-Error: Invalid application index.
 ____________________________________________________________
 ____________________________________________________________
 Deadline updated! Google's Software Engineer's Online Assessment due date is now on the [2026-12-12]

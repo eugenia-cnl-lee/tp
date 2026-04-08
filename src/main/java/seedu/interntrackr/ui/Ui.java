@@ -71,7 +71,13 @@ public class Ui {
         assert message != null : "error message must not be null";
         String safeMessage = (message != null) ? message : "Unknown error";
         logger.warning("Displaying error to user: " + safeMessage);
-        System.out.println("Error: " + safeMessage);
+
+        String[] lines = safeMessage.split("\\R");
+        for (String line : lines) {
+            if (!line.isEmpty()) {
+                System.out.println("Error: " + line);
+            }
+        }
     }
 
     public void showLoadingError() {
