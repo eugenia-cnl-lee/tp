@@ -392,7 +392,7 @@ The `filter` feature allows users to navigate large lists of applications by iso
 
 #### 1.1 Implementation Details
 
-The feature is implemented through the `FilterCommand` and `FilterCommandParser` classes. The logic is designed to be case-insensitive and resilient to user input variations.
+The filter feature is implemented through a two-step process: parsing and execution. The `FilterCommandParser` first validates the input and prefix. Once created, the `FilterCommand` iterates through the `ApplicationList`, ignoring archived entries and matching the normalized status against the user's query.
 
 **1.1.1 Parsing Logic**
 The `FilterCommandParser#parse()` method handles the initial input processing:
@@ -403,9 +403,9 @@ The `FilterCommandParser#parse()` method handles the initial input processing:
 
 
 **Transition to Execution**
-The FilterCommandParser acts as a factory that translates raw user input into a configured FilterCommand object.
-This object encapsulates the validated status string (or the isClear flag), which is then passed to the main execution loop.
-This separation ensures that the FilterCommand itself does not need to know about the s/ prefix or raw string splitting, focusing purely on the filtering logic.
+The `FilterCommandParser` acts as a factory that translates raw user input into a configured `FilterCommand` object.
+This object encapsulates the validated status string (or the `isClear` flag), which is then passed to the main execution loop.
+This separation ensures that the `FilterCommand` itself does not need to know about the s/ prefix or raw string splitting, focusing purely on the filtering logic.
 
 **1.1.2 Execution Logic**
 When `FilterCommand#execute()` is called, it performs the following steps:
@@ -419,18 +419,21 @@ When `FilterCommand#execute()` is called, it performs the following steps:
 
 #### 1.2 Sequence Diagrams
 
-The diagram below illustrates the end-to-end interaction from user input to result display. It specifically highlights how `FilterCommand` interacts with the `Application` class to perform static validation and normalization before iterating through the `ApplicationList`.
-
-The following diagram details the internal logic within the `execute()` method, with the loop and the conditional checks for archived states and status matches.
+The command iterates through the ApplicationList. It skips archived entries and matches the "normalized" status (Title Case) to ensure consistency.
 
 ![Filter Parsing Sequence Diagram](images/EmryFilterCommandSequence.png)
+
+The filter command isolates applications by their current status (e.g., Applied, Interview). FilterCommandParser handles case-insensitivity and strips the s/ prefix.
+
 ![FilterCommandParser Sequence Diagram](images/EmryFilterParserSequence.png)
 
-The diagram below shows the internal logic of the `FilterCommand` during execution:
+### 1.3 Filter State Snapshot
 
-![Filter Execution Sequence Diagram](images/EmryFilterLogic.png)
+The following object diagram illustrates a scenario where a user filters for the "Applied" status. In this state, app1 is the only application that will be displayed because it matches the status and is not archived. app2 is excluded due to a status mismatch, and app3 is excluded because it is archived.
 
-#### 1.3 Design Considerations
+![Filter Object Diagram](images/EmryFilterObject.png)
+
+#### 1.4 Design Considerations
 
 **Aspect: Normalization vs. Literal Matching**
 * **Alternative 1**: Match the user's input exactly against the stored data.

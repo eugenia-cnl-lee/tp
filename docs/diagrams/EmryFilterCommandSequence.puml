@@ -2,71 +2,35 @@
 skinparam ParticipantPadding 20
 skinparam BoxPadding 10
 
-actor User
 participant ":InternTrackr" as IT
-participant ":Parser" as P
 participant "c:FilterCommand" as FC
 participant ":ApplicationList" as AL
-participant "<<class>>\n:Application" as AppClass
 participant "app:Application" as App
 participant ":Ui" as UI
 
-User -> IT : "filter Applied"
-IT -> P : parseCommand("filter Applied")
-activate P
-create FC
-P -> FC : FilterCommand("Applied")
-P --> IT : c
-deactivate P
+[-> IT : executeCommand()
+activate IT
 
 IT -> FC : execute(applications, ui, storage)
 activate FC
 
-FC -> AppClass : isValidStatus("Applied")
-activate AppClass
-AppClass --> FC : true
-deactivate AppClass
+ref over FC, AL : Validation and Normalization of Status
 
-FC -> AppClass : getNormalizedStatus("Applied")
-activate AppClass
-AppClass --> FC : "Applied"
-deactivate AppClass
-
-FC -> AL : getSize()
-activate AL
-AL --> FC : size
-deactivate AL
-
-loop for each application (1 to size)
+loop for each application in ApplicationList
     FC -> AL : getApplication(i)
     activate AL
     AL --> FC : app
     deactivate AL
 
-    FC -> App : isArchived()
-    activate App
-    App --> FC : false
-    deactivate App
-
-    FC -> App : getStatus()
-    activate App
-    App --> FC : "Applied"
-    deactivate App
-
-    alt status matches searchStatus
-        FC -> UI : showMessage(displayIndex + ". " + app.toString())
+    alt app matches filter criteria AND is not archived
+        FC -> UI : showMessage(app.toString())
         activate UI
         UI --> FC
         deactivate UI
     end
 end
 
-alt matchCount == 0
-    FC -> UI : showMessage("No applications found...")
-    activate UI
-    UI --> FC
-    deactivate UI
-end
-
 deactivate FC
+[<-- IT
+deactivate IT
 @enduml
