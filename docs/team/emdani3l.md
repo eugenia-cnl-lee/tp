@@ -16,7 +16,7 @@
     * Designed a defensive, blocking workflow that interrupts the standard non-interactive command flow to prioritize data safety. This was a non-trivial implementation that requires the command to wait for and validate a specific interactive response before committing a permanent, non-recoverable wipe to the local storage.
 
 ### 2. Code Contributed
-* [Link to RepoSense Dashboard] *(https://nus-cs2113-ay2526-s2.github.io/tp-dashboard/?search=emdani3l&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2026-02-20T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=)*
+* [Link to RepoSense Dashboard](https://nus-cs2113-ay2526-s2.github.io/tp-dashboard/?search=emdani3l&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2026-02-20T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=)
 
 ### 3. Contributions to the User Guide (Extracts)
 
