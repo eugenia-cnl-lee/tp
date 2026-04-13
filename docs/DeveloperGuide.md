@@ -46,24 +46,24 @@ The `Ui` class owns all terminal interaction — nothing else in the app touches
 
 #### 3. Overview Feature Implementation
 
-The `overview` command gives users a quantitative snapshot of their internship applications, including a detailed analytics breakdown by stage.
+The `overview` command gives users a quantitative snapshot of their internship applications, including a detailed breakdown by stage for active applications.
 
 **Implementation Details:**
 
 The feature is handled by `OverviewCommand`, which extends the abstract `Command` class. Here's what happens when it runs:
 
-1. It queries `ApplicationList` for the current application count.
-2. It iterates through the list, aggregating the frequencies of each application state (e.g., Applied, Pending) using a `LinkedHashMap` to maintain order based on `Application.VALID_STATUSES`.
-3. It passes this data to `Ui` to format and display the analytics summary.
-4. Since it's a read-only operation, it never touches `Storage`.
+1. It queries `ApplicationList` for the current application count (including archived).
+2. It iterates through the list, skipping archived applications, and aggregates the frequency of each status using a `LinkedHashMap` to maintain the order defined by `Application.VALID_STATUSES`.
+3. It passes the active-only counts to `Ui` under the heading **"Active Status Breakdown"**, making it clear that archived applications are intentionally excluded from the breakdown.
+4. Since it is a read-only operation, it never writes to `Storage`.
 
 ![Overview Command Sequence Diagram](images/SanjaiOverviewCommandSequence.png)
 
-**End-to-End Execution:**
+**Runtime State Snapshot:**
 
-The diagram below shows the full flow — from the user typing `overview` all the way to the output appearing on screen.
+The object diagram below shows a representative runtime state when `overview` is run. `app3` is archived, so it is excluded from the Active Status Breakdown even though its `status` field is `"Applied"`. The breakdown correctly shows `Applied: 1, Interview: 1` rather than `Applied: 2`.
 
-![End-to-End Sequence Diagram](images/SanjaiEndToEndSequence.png)
+![Overview Object Diagram](images/SanjaiObjectDiagram.png)
 
 #### 4. Offer Feature Implementation
 
@@ -86,9 +86,11 @@ The `contact` command allows users to store recruiter details directly alongside
 **Implementation Details:**
 
 1. The command takes in the target index, the contact name (prefixed by `c/`), and the contact email (prefixed by `e/`).
-2. `ContactCommand#execute()` verifies the index bounds against the `ApplicationList`.
-3. It updates the internal state of the selected `Application` with the provided name and email.
+2. `ContactCommand#execute()` verifies the index bounds against the active (non-archived) applications.
+3. It updates the internal state of the selected `Application` with the provided name and email via `setContactDetails()`.
 4. `Storage#save()` is triggered immediately to ensure these networking details are securely written to disk and persist across sessions.
+
+**Note on INDEX:** The index always refers to the position shown in the default `list` output (active applications only). The `filter` command affects only the display — it does not alter the underlying list order or the indices used by commands such as `contact`, `status`, or `offer`.
 
 ![Contact Command Sequence Diagram](images/SanjaiContactCommandSequence.png)
 
