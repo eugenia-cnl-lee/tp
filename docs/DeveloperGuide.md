@@ -186,7 +186,7 @@ which contains multiple `Deadline` objects.
 
 The diagram below shows the ownership structure and encapsulation of deadlines:
 
-![Deadline Class Diagram](images/DeadlineClassDiagram.png)
+![Deadline Class Diagram](images/EugeniaClassDiagram.png)
 
 **1.1 Evolution of Design**
 
