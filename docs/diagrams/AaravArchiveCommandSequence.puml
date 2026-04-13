@@ -1,15 +1,21 @@
 @startuml
 actor User
+participant ":InternTrackr" as IT
 participant ":Parser" as P
+participant ":ArchiveCommandParser" as ACP
 participant ":ArchiveCommand" as AC
 participant ":ApplicationList" as AL
 participant "app:Application" as app
 participant ":Ui" as UI
 participant ":Storage" as S
 
-User -> P : parse("archive 1")
-P -> AC : <<create>>
+User -> IT : run("archive 1")
+IT -> P : parse(fullCommand)
+P -> ACP : parse(arguments)
+ACP --> P : command
+P --> IT : command
 
+IT -> AC : execute(...)
 AC -> AL : getActiveApplication(1)
 AL --> AC : app
 AC -> app : setArchived(true)

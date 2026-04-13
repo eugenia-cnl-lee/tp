@@ -634,11 +634,11 @@ The diagram below illustrates the confirmation loop and subsequent data clearing
 
 #### 1. Class Overview
 
-The diagram below shows the classes involved in Aarav's features and their relationships.
+The diagram below shows the main classes involved in Aarav's features and their relationships.
 
 ![Class Diagram](images/AaravClassDiagram.png)
 
-`Parser` acts as a pure dispatcher, delegating argument parsing to dedicated `XYZCommandParser` classes. Each command class operates on `ApplicationList`, which internally manages `Application` objects. The `isArchived` field on `Application` is the shared state that connects the archive, unarchive, list archive, and delete workflows.
+`Parser` is the central command dispatcher. It performs top-level validation on the raw user input, then either delegates argument parsing to a dedicated `XYZCommandParser` class or directly constructs simple command objects. Each command class operates on `ApplicationList`, which internally manages `Application` objects. The `isArchived` field in `Application` is the shared state that connects the archive, unarchive, list archive, and delete workflows.
 
 ---
 
@@ -686,7 +686,7 @@ When `AddCommand#execute()` is called:
 
 #### 3. Delete Feature Implementation
 
-The `delete` feature removes an active internship application from the tracker.
+The `delete` feature removes an internship application from the tracker. It supports deleting both active and archived applications.
 
 ##### 3.1 Implementation Details
 
@@ -697,24 +697,24 @@ The feature is implemented through `DeleteCommandParser` and `DeleteCommand`.
 The `DeleteCommandParser#parse()` method:
 
 1. Verifies that an index is provided.
-2. Checks if the argument begins with the keyword `archive`. If so, sets an `isArchived` flag to `true` and strips the keyword before parsing the remaining index.
+2. Checks if the argument begins with the keyword `archive`. If so, it sets an `isArchived` flag to `true` and strips the keyword before parsing the remaining index.
 3. Rejects any input containing trailing text after the index, showing the correct usage format in the error message.
 4. Parses the index as an integer.
 5. Rejects non-numeric or non-positive values with an `InternTrackrException`, showing the correct usage format in each case.
 
-This allows both `delete INDEX` (active applications) and `delete archive INDEX` (archived applications) to be supported from a single parser.
+This allows both `delete INDEX` and `delete archive INDEX` to be supported from a single parser.
 
 **3.1.2 Execution Logic**
 
 When `DeleteCommand#execute()` is called:
 
-1. Based on the `isArchived` flag, it resolves the provided index using either `ApplicationList#getActiveApplication()` (for active deletions) or `ApplicationList#getArchivedApplication()` (for archived deletions). If the active list is empty, a friendly message `"No applications found. Start adding some!"` is shown instead of a misleading range error. If all applications have been archived, the message `"No active applications. Use 'list archive' to view archived ones."` is shown instead. Similarly, when `delete archive INDEX` is used on an empty archive, the message `"There are no archived applications."` is shown.
+1. Based on the `isArchived` flag, it resolves the provided index using either `ApplicationList#getActiveApplication()` for active deletions or `ApplicationList#getArchivedApplication()` for archived deletions.
 2. It retrieves the full backing list via `ApplicationList#getApplications()` and performs a linear scan by object identity to find the application's actual position in the backing list.
 3. It removes the application from the backing list using `ApplicationList#deleteApplication()`.
 4. It displays a confirmation message through `Ui`, using `ApplicationList#countActive()` to show the number of remaining active applications.
 5. It immediately calls `Storage#save()` so the deletion is persisted.
 
-This design ensures that the index used by `delete` always matches what the user sees in the corresponding list view (`list` for active, `list archive` for archived).
+This design ensures that the index used by `delete` matches what the user sees in the corresponding list view: `list` for active applications and `list archive` for archived applications.
 
 ![Delete Command Sequence Diagram](images/AaravDeleteCommandSequence.png)
 
@@ -725,16 +725,16 @@ This design ensures that the index used by `delete` always matches what the user
 * **Alternative 1:** Delete directly by backing-list index.
   * *Pros:* Simpler internal implementation.
   * *Cons:* The index would not match the default list shown to users once archived entries exist.
-* **Alternative 2 (Current Choice):** Resolve the index against the relevant view (active or archived).
+* **Alternative 2 (Current Choice):** Resolve the index against the relevant view first, then map the selected application back to the backing list.
   * *Reasoning:* This keeps command behavior consistent with the visible list and reduces user confusion.
 
 **Aspect: Deleting archived applications**
 
 * **Alternative 1:** Require users to unarchive an application before deleting it.
-  * *Pros:* Simpler command — only one deletion path.
+  * *Pros:* Simpler command design with only one deletion path.
   * *Cons:* Forces an unnecessary unarchive step, cluttering the active list temporarily just to delete a record.
 * **Alternative 2 (Current Choice):** Support `delete archive INDEX` as a first-class command.
-  * *Reasoning:* Users sometimes want to permanently discard an archived application without restoring it first. Adding the `archive` keyword keeps it explicit and mirrors the same index the user sees in `list archive`.
+  * *Reasoning:* Users may want to permanently discard an archived application without restoring it first. Adding the `archive` keyword keeps this explicit and mirrors the same index the user sees in `list archive`.
 
 ---
 
@@ -752,10 +752,11 @@ When `Parser#parse()` is called:
 4. It normalizes the command word to lowercase.
 5. It uses a `switch` statement to route the input to the correct parser or command constructor.
 6. For commands such as `add`, `delete`, `archive`, and `unarchive`, it delegates parsing to `AddCommandParser`, `DeleteCommandParser`, `ArchiveCommandParser`, and `UnarchiveCommandParser` respectively.
-7. For `list`, it supports both `list` (returns `ListCommand`) and `list archive` (returns `ListArchiveCommand`). Any other argument after `list` throws an `InternTrackrException`.
-8. If the command word does not match any known command, it throws an `InternTrackrException`.
+7. For simple commands such as `help`, `clear`, `overview`, and `exit`, it directly constructs the corresponding command object.
+8. For `list`, it supports both `list` and `list archive`. `list` returns a `ListCommand`, while `list archive` returns a `ListArchiveCommand`. Any other argument after `list` throws an `InternTrackrException`.
+9. If the command word does not match any known command, it throws an `InternTrackrException`.
 
-Unlike `add`, `delete`, and `archive`, `list archive` does not use a dedicated parser class. Instead, `Parser` handles it directly because its parsing logic is a simple string equality check.
+Unlike `add`, `delete`, `archive`, and `unarchive`, `list archive` does not use a dedicated parser class. Instead, `Parser` handles it directly because its parsing logic is only a simple string equality check.
 
 ![Parser Sequence Diagram](images/AaravParserSequence.png)
 
@@ -772,16 +773,16 @@ Unlike `add`, `delete`, and `archive`, `list archive` does not use a dedicated p
 **Aspect: Per-command parser classes vs inline parsing**
 
 * **Alternative 1:** Parse all commands inline inside `Parser.java`.
-  * *Pros:* Fewer files and simpler project structure.
-  * *Cons:* `Parser.java` grows with every new command, eventually becoming a large monolithic class that is hard to read and test.
-* **Alternative 2 (Current Choice):** Delegate to dedicated `XYZCommandParser` classes.
-  * *Reasoning:* Keeps `Parser.java` as a thin dispatcher. Each parser class is independently testable, and adding a new command only requires a new file without modifying existing parsing logic.
+  * *Pros:* Fewer files and a simpler project structure.
+  * *Cons:* `Parser.java` would grow with every new command, eventually becoming a monolithic class that is harder to read and test.
+* **Alternative 2 (Current Choice):** Delegate to dedicated `XYZCommandParser` classes where structured argument parsing is needed.
+  * *Reasoning:* This keeps `Parser.java` relatively small. Each parser class is independently testable, and adding a new command usually only requires adding a new parser class and a new switch branch.
 
 **Aspect: No dedicated parser for `list archive`**
 
 * **Alternative 1:** Introduce a separate `ListArchiveCommandParser`.
   * *Pros:* Symmetry with the other commands.
-  * *Cons:* Adds another class for very little parsing logic — the check is a single `equalsIgnoreCase` call.
+  * *Cons:* Adds another class for very little parsing logic.
 * **Alternative 2 (Current Choice):** Handle `list archive` directly inside `Parser`.
   * *Reasoning:* Since the command only checks whether the `list` argument equals `archive`, a dedicated parser would add unnecessary complexity.
 
@@ -827,61 +828,50 @@ Once archived, the application no longer appears in the default `list` output, b
 * **Alternative 2 (Current Choice):** Archive applications instead of deleting them.
   * *Reasoning:* This preserves application history while keeping the active list uncluttered.
 
-**Aspect: Storing `isArchived` in the storage file**
+**Aspect: Storing archived state in the storage file**
 
-* **Alternative 1:** Store `isArchived` as a plain `true`/`false` field appended to the storage line.
+* **Alternative 1:** Store the archived state as a plain `true` or `false` field appended to the storage line.
   * *Pros:* Minimal change to the format.
-  * *Cons:* Ambiguous — a deadline's `isDone` field is also stored as `true`/`false`, making it impossible for the parser to distinguish the two when the last deadline happens to be completed.
-* **Alternative 2 (Current Choice):** Only append `| archived:true` when the application is archived, and omit the field entirely otherwise.
-  * *Reasoning:* The `archived:true` token is unambiguous and never conflicts with any other field value. Non-archived applications produce the exact same storage format as before, preserving backward compatibility with existing data files.
+  * *Cons:* Ambiguous, because deadline completion is also stored using boolean values, making the last field harder to interpret safely during parsing.
+* **Alternative 2 (Current Choice):** Store the archived state using a labeled field such as `archived:true`.
+  * *Reasoning:* This keeps the storage format human-editable while avoiding ambiguity with deadline fields.
 
 ---
 
 #### 6. List Archive Feature Implementation
 
-The `list archive` feature displays all archived internship applications.
+The `list archive` feature allows users to view all archived applications separately from the active list.
 
 ##### 6.1 Implementation Details
 
-The feature is implemented through `Parser` and `ListArchiveCommand`.
-
-`Parser` directly returns a `ListArchiveCommand` when it detects the input `list archive`.
+The feature is implemented through `ListArchiveCommand`. Unlike other commands with structured arguments, it is handled directly in `Parser` because the parsing logic is simple.
 
 When `ListArchiveCommand#execute()` is called:
 
-1. It performs a first pass through the full `ApplicationList` to count archived applications.
-2. If no archived applications exist, it informs the user and returns immediately.
-3. Otherwise, it prints a header and performs a second pass, displaying each archived application with a sequential display index starting at 1.
-4. If an archived application contains a note, the note is displayed underneath it.
+1. It performs a first pass over `ApplicationList` to determine whether any archived applications exist.
+2. If none exist, it shows a friendly message through `Ui`.
+3. Otherwise, it shows a header and performs a second pass over `ApplicationList`.
+4. During the second pass, it displays each archived application through `Ui`.
 
-This feature is read-only and does not call `Storage#save()`.
+The command uses a two-pass design so it can decide whether to show an empty-state message or a proper archived-applications header before printing entries.
 
 ![List Archive Command Sequence Diagram](images/AaravListArchiveCommandSequence.png)
 
 ##### 6.2 Design Considerations
 
-**Aspect: Showing archived entries in a separate view**
+**Aspect: One-pass vs two-pass listing**
 
-* **Alternative 1:** Show archived and active applications together in one list.
-  * *Pros:* All data is visible in one command.
-  * *Cons:* The default list becomes cluttered and less useful for active job tracking.
-* **Alternative 2 (Current Choice):** Keep archived entries in a separate `list archive` view.
-  * *Reasoning:* This preserves historical data while keeping the primary workflow focused on active applications.
-
-**Aspect: Two-pass vs single-pass iteration**
-
-* **Alternative 1:** Single pass — check count and display in the same loop.
-  * *Pros:* Slightly more efficient.
-  * *Cons:* The header `"Here are your archived internship applications:"` would need to be printed before knowing whether there are any results, leading to an awkward header followed by an empty message.
-* **Alternative 2 (Current Choice):** Two passes — count first, then display.
-  * *Reasoning:* Ensures the header is only printed when there are actual results to show, producing cleaner output.
-
+* **Alternative 1:** Print archived applications in a single pass.
+  * *Pros:* Slightly less iteration.
+  * *Cons:* Makes it harder to decide whether to print a clean empty-state message or a header without extra control logic.
+* **Alternative 2 (Current Choice):** Use a two-pass approach.
+  * *Reasoning:* The first pass cleanly determines whether archived entries exist, while the second pass handles display. This keeps the output logic simple and predictable.
 
 ---
 
 #### 7. Unarchive Feature Implementation
 
-The `unarchive` feature allows users to restore a previously archived application back to the active list.
+The `unarchive` feature restores an archived application to the active list.
 
 ##### 7.1 Implementation Details
 
@@ -901,27 +891,23 @@ The `UnarchiveCommandParser#parse()` method:
 When `UnarchiveCommand#execute()` is called:
 
 1. It resolves the provided index against the archived applications using `ApplicationList#getArchivedApplication()`.
-2. It restores the target application by calling `Application#setArchived(false)`.
+2. It marks the target application as active again by calling `Application#setArchived(false)`.
 3. It shows confirmation output through `Ui`.
 4. It immediately calls `Storage#save()` so the restored state is persisted.
 
-Once unarchived, the application reappears in the default `list` output and no longer appears in `list archive`.
+Once unarchived, the application reappears in the default `list` output.
 
 ![Unarchive Command Sequence Diagram](images/AaravUnarchiveCommandSequence.png)
 
 ##### 7.2 Design Considerations
 
-**Aspect: Indexing against `list archive` output**
+**Aspect: Restore archived entries vs leave archive as permanent-only storage**
 
-* **Alternative 1:** Resolve the index against the full backing list.
+* **Alternative 1:** Make archived applications view-only and non-restorable.
   * *Pros:* Simpler implementation.
-  * *Cons:* The index would not match what the user sees in `list archive`, causing confusion.
-* **Alternative 2 (Current Choice):** Resolve the index against archived entries only via `ApplicationList#getArchivedApplication()`.
-  * *Reasoning:* This keeps `unarchive` consistent with `list archive` — the user uses the same index they see on screen.
-
-**Aspect: Symmetric design with `archive`**
-
-* The `unarchive` command is intentionally symmetric with `archive`. Both resolve their index against the view the user is operating in (`list` for `archive`, `list archive` for `unarchive`), and both immediately persist the change via `Storage#save()`.
+  * *Cons:* Users cannot recover archived entries they still want to continue tracking.
+* **Alternative 2 (Current Choice):** Support `unarchive INDEX`.
+  * *Reasoning:* Archiving is intended to hide inactive applications, not permanently lock them away. Supporting restoration makes the feature more flexible and forgiving.
 
 <!-- @@author -->
 

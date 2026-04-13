@@ -1,13 +1,23 @@
 @startuml
 actor User
+participant ":InternTrackr" as IT
 participant ":Parser" as P
 participant ":ListArchiveCommand" as LAC
 participant ":ApplicationList" as AL
 participant ":Ui" as UI
 
-User -> P : parse("list archive")
-note right of P : Handled directly, no parser class.
+User -> IT : run("list archive")
+IT -> P : parse(fullCommand)
+
+note right of P
+  Handled directly in Parser,
+  no dedicated parser class.
+end note
+
 P -> LAC : <<create>>
+P --> IT : command
+
+IT -> LAC : execute(...)
 
 loop first pass: count archived apps
     LAC -> AL : getApplication(i)
@@ -16,21 +26,13 @@ end
 
 alt no archived applications
     LAC -> UI : showMessage("No archived applications found.")
-    activate UI
     UI --> User : empty message
-    deactivate UI
 else archived applications exist
     LAC -> UI : showMessage(header)
-    activate UI
-    UI --> LAC
-    deactivate UI
     loop second pass: display each archived app
         LAC -> AL : getApplication(i)
         AL --> LAC : app
         LAC -> UI : showMessage(app details)
-        activate UI
-        UI --> LAC
-        deactivate UI
     end
     UI --> User : archived applications list
 end

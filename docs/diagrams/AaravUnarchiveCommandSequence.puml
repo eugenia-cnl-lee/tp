@@ -1,15 +1,21 @@
 @startuml
 actor User
+participant ":InternTrackr" as IT
 participant ":Parser" as P
+participant ":UnarchiveCommandParser" as UCP
 participant ":UnarchiveCommand" as UC
 participant ":ApplicationList" as AL
 participant "app:Application" as app
 participant ":Ui" as UI
 participant ":Storage" as S
 
-User -> P : parse("unarchive 1")
-P -> UC : <<create>>
+User -> IT : run("unarchive 1")
+IT -> P : parse(fullCommand)
+P -> UCP : parse(arguments)
+UCP --> P : command
+P --> IT : command
 
+IT -> UC : execute(...)
 UC -> AL : getArchivedApplication(1)
 AL --> UC : app
 UC -> app : setArchived(false)
