@@ -173,7 +173,7 @@ To handle applications accumulating large numbers of deadlines without clutterin
 
 <!-- @@author eugenia-cnl-lee -->
 
-### ### Deadline Feature and Parser Implementation
+### Deadline Feature and Parser Implementation
 
 **Author:** Eugenia
 
@@ -244,10 +244,15 @@ A list-based design better models real internship workflows and allows future ex
 ### 2. Deadline Parser Design
 
 The `deadline` command uses a dedicated `DeadlineCommandParser` to handle all
-deadline-related subcommands (`add`, `list`, `done`).
+deadline-related subcommands (`add`, `list`, `done`, `undone`, `delete`).
 
 Unlike other commands that may use separate parser classes, all deadline parsing
 logic is centralised within a single parser to handle subcommand dispatching.
+
+The sequence diagram below shows how `Parser` delegates deadline commands to
+`DeadlineCommandParser`, which then creates the appropriate deadline command object:
+
+![Deadline Command Parser Sequence Diagram](images/EugeniaDeadlineCommandParserSequence.png)
 
 #### 2.1 Parsing Flow
 
@@ -255,11 +260,13 @@ When the user inputs a `deadline` command:
 
 1. The main `Parser` identifies the `deadline` keyword
 2. Control is delegated to `DeadlineCommandParser`
-3. The parser extracts the subcommand (`add`, `list`, `done`)
+3. The parser extracts the subcommand (`add`, `list`, `done`, `undone`, `delete`)
 4. Based on the subcommand:
     - `add` → constructs `DeadlineAddCommand`
     - `list` → constructs `DeadlineListCommand`
     - `done` → constructs `DeadlineDoneCommand`
+    - `undone` → constructs `DeadlineUndoneCommand`
+    - `delete` → constructs `DeadlineDeleteCommand`
 5. Arguments are validated before command construction (fail-fast)
 
 This ensures that only valid command objects are created and executed.
