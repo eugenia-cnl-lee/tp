@@ -1,0 +1,55 @@
+@startuml
+actor User
+participant ":Parser" as P
+participant ":DeadlineCommandParser" as DCP
+participant "duc:DeadlineUndoneCommand" as DUC
+participant ":ApplicationList" as AL
+participant "app:Application" as APP
+participant "dl:DeadlineList" as DL
+participant "d:Deadline" as D
+participant ":Ui" as UI
+participant ":Storage" as S
+
+User -> P : parse("deadline undone 2 i/2")
+P -> DCP : parse("undone 2 i/2")
+DCP -> DUC : <<create>>
+DCP --> P : duc
+
+P -> DUC : execute(applications, ui, storage)
+
+DUC -> AL : countActive()
+AL --> DUC : activeCount
+
+alt invalid application index
+    DUC --> P : throws InternTrackrException
+else valid application index
+    DUC -> AL : getActiveApplication(applicationIndex)
+    AL --> DUC : app
+    DUC -> APP : getDeadlines()
+    APP --> DUC : dl
+    DUC -> DL : getSize()
+    DL --> DUC : deadlineCount
+
+    alt invalid deadline index
+        DUC --> P : throws InternTrackrException
+    else valid deadline index
+        DUC -> DL : getDeadline(deadlineIndex)
+        DL --> DUC : d
+        DUC -> D : getIsDone()
+        D --> DUC : isDone
+
+        alt deadline already undone
+            DUC --> P : throws InternTrackrException
+        else deadline is done
+            DUC -> D : setNotDone()
+            DUC -> UI : showMessage("Okay! Marked this deadline as undone:")
+            DUC -> D : toString()
+            D --> DUC : formattedDeadline
+            DUC -> UI : showMessage(deadlineIndex + ". " + formattedDeadline)
+            DUC -> AL : getApplications()
+            AL --> DUC : applications
+            DUC -> S : save(applications)
+        end
+    end
+end
+@enduml

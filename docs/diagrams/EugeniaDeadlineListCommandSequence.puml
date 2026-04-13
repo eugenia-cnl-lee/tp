@@ -1,0 +1,44 @@
+@startuml
+actor User
+participant ":Parser" as P
+participant ":DeadlineCommandParser" as DCP
+participant "dlc:DeadlineListCommand" as DLC
+participant ":ApplicationList" as AL
+participant "app:Application" as APP
+participant "dl:DeadlineList" as DL
+participant ":Ui" as UI
+
+User -> P : parse("deadline list 2")
+P -> DCP : parse("list 2")
+DCP -> DLC : <<create>>
+DCP --> P : dlc
+
+User -> DLC : execute(applications, ui, storage)
+
+DLC -> AL : countActive()
+AL --> DLC : activeCount
+
+alt invalid application index
+    DLC --> User : throws InternTrackrException
+else valid application index
+    DLC -> AL : getActiveApplication(index)
+    AL --> DLC : app
+    DLC -> APP : getDeadlines()
+    APP --> DLC : dl
+    DLC -> DL : getSize()
+    DL --> DLC : deadlineCount
+
+    alt no deadlines found
+        DLC -> UI : showMessage("No deadlines found for this application.")
+    else deadlines exist
+        DLC -> UI : showMessage("Here are the deadlines for this application:")
+        loop for each deadline
+            DLC -> DL : getDeadline(i)
+            DL --> DLC : d
+            DLC -> d : toString()
+            d --> DLC : formattedDeadline
+            DLC -> UI : showMessage(i + ". " + formattedDeadline)
+        end
+    end
+end
+@enduml

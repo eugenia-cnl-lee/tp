@@ -1,0 +1,50 @@
+@startuml
+actor User
+participant ":Parser" as P
+participant ":DeadlineCommandParser" as DCP
+participant "ddelc:DeadlineDeleteCommand" as DDELC
+participant ":ApplicationList" as AL
+participant "app:Application" as APP
+participant "dl:DeadlineList" as DL
+participant "d:Deadline" as D
+participant ":Ui" as UI
+participant ":Storage" as S
+
+User -> P : parse("deadline delete 2 i/2")
+P -> DCP : parse("delete 2 i/2")
+DCP -> DDELC : <<create>>
+DCP --> P : ddelc
+
+P -> DDELC : execute(applications, ui, storage)
+
+DDELC -> AL : countActive()
+AL --> DDELC : activeCount
+
+alt invalid application index
+    DDELC --> P : throws InternTrackrException
+else valid application index
+    DDELC -> AL : getActiveApplication(applicationIndex)
+    AL --> DDELC : app
+    DDELC -> APP : getDeadlines()
+    APP --> DDELC : dl
+    DDELC -> DL : getSize()
+    DL --> DDELC : deadlineCount
+
+    alt invalid deadline index
+        DDELC --> P : throws InternTrackrException
+    else valid deadline index
+        DDELC -> DL : deleteDeadline(deadlineIndex)
+        DL --> DDELC : d
+        DDELC -> UI : showMessage("Noted. I've removed this deadline:")
+        DDELC -> D : toString()
+        D --> DDELC : formattedDeadline
+        DDELC -> UI : showMessage(formattedDeadline)
+        DDELC -> DL : getSize()
+        DL --> DDELC : remainingCount
+        DDELC -> UI : showMessage("Now you have " + remainingCount + " deadlines for this application.")
+        DDELC -> AL : getApplications()
+        AL --> DDELC : applications
+        DDELC -> S : save(applications)
+    end
+end
+@enduml

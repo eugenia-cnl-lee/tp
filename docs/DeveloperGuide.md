@@ -172,38 +172,450 @@ To handle applications accumulating large numbers of deadlines without clutterin
 <!-- @@author -->
 
 <!-- @@author eugenia-cnl-lee -->
-### Deadline Features
+
+### Deadline Feature and Parser Implementation
 
 **Author:** Eugenia
 
-The `deadline list` command allows users to view all deadlines associated with a specific application.
-
-#### Implementation Details
-
-1. The command takes in the target index.
-2. It retrieves the corresponding `Application` from `ApplicationList`.
-3. It accesses the application's associated deadlines.
-4. Each deadline is formatted and displayed via `Ui`.
-
-#### Design Considerations
-
-**Aspect: Supporting multiple deadlines per application**
-
-* **Alternative 1 (previous design):** Store a single `Deadline` in `Application`
-  * Pros: Simpler implementation
-  * Cons: Cannot support multiple deadlines per application
-
-* **Alternative 2 (Current Choice):** Introduce a `DeadlineList`
-  * Pros: Supports multiple deadlines and enables future features such as sorting and filtering
-  * Cons: Requires refactoring across model, storage, and commands
-
-* **Reasoning:** Internship applications often involve multiple stages (e.g. OA, interviews, offers), each with its own deadline. Supporting multiple deadlines improves realism and extensibility.
-
-#### Notes
-
-* Index validation ensures safe access to applications
-* If no deadlines exist, an appropriate message is shown to the user
 ---
+
+### 1. Deadline Model Design
+
+The deadline feature is built on a model where each `Application` owns a `DeadlineList`,
+which contains multiple `Deadline` objects.
+
+The diagram below shows the ownership structure and encapsulation of deadlines:
+
+![Deadline Class Diagram](images/EugeniaClassDiagram.png)
+
+The diagram below illustrates a snapshot of the system where a single
+application contains multiple deadlines with different completion states:
+
+![Deadline Object Diagram](images/EugeniaObjectDiagram.png)
+
+In this example, `app1` represents an application that owns a `DeadlineList`,
+which contains two `Deadline` objects:
+
+- `d1` is marked as completed (`isDone = true`)
+- `d2` is still pending (`isDone = false`)
+
+This demonstrates how multiple deadlines are associated with a single application
+and how their completion states are tracked independently.
+
+#### 1.1 Evolution of Design
+
+**Iteration 1 (v1.0): Single deadline per application**
+
+- `Application` stored a single `Deadline`
+
+*Pros:*
+- Simpler implementation
+- Minimal changes to model
+
+*Cons:*
+- New deadlines overwrite existing ones
+- Cannot represent multiple stages
+- Prevents `deadline list` feature
+
+**Iteration 2 (v2.0): Multiple deadlines via `DeadlineList` (Current Choice)**
+
+- `Application` stores a `DeadlineList`
+
+*Pros:*
+- Supports multiple deadlines
+- Enables indexed operations (`list`, `done`)
+- Aligns with real-world workflows
+
+*Cons:*
+- Requires refactoring across components
+
+**Reasoning:**
+A list-based design better models real internship workflows and allows future extensions.
+
+#### 1.2 Model Constraints
+
+- `deadlineType` must not be null or blank
+- `dueDate` must not be null
+- `deadlineType` is trimmed before storage
+- `isDone` defaults to `false`
+- Deadlines are scoped per application (no global access)
+- State modified only via model methods (`setDone()`)
+
+**Aspect: Per-application deadlines vs global deadline list**
+
+* **Alternative 1:** Global deadline list
+    + Pros: Easier aggregation and sorting
+    + Cons: Loses association with applications
+
+* **Alternative 2 (Current Choice):** Deadlines scoped per application
+    + Pros: Maintains clear ownership and context
+    + Cons: Harder to aggregate across applications
+    + **Reasoning:** Users think of deadlines as tied to specific applications,
+      so preserving this relationship improves usability and mental mapping.
+
+---
+
+### 2. Deadline Parser Design
+
+The `deadline` command uses a dedicated `DeadlineCommandParser` to handle all
+deadline-related subcommands (`add`, `list`, `done`, `undone`, `delete`).
+
+Unlike other commands that may use separate parser classes, all deadline parsing
+logic is centralised within a single parser to handle subcommand dispatching.
+
+The sequence diagram below shows how `Parser` delegates deadline commands to
+`DeadlineCommandParser`, which then creates the appropriate deadline command object:
+
+![Deadline Command Parser Sequence Diagram](images/EugeniaDeadlineCommandParserSequence.png)
+
+#### 2.1 Parsing Flow
+
+When the user inputs a `deadline` command:
+
+1. The main `Parser` identifies the `deadline` keyword
+2. Control is delegated to `DeadlineCommandParser`
+3. The parser extracts the subcommand (`add`, `list`, `done`, `undone`, `delete`)
+4. Based on the subcommand:
+    - `add` → constructs `DeadlineAddCommand`
+    - `list` → constructs `DeadlineListCommand`
+    - `done` → constructs `DeadlineDoneCommand`
+    - `undone` → constructs `DeadlineUndoneCommand`
+    - `delete` → constructs `DeadlineDeleteCommand`
+5. Arguments are validated before command construction (fail-fast)
+
+This ensures that only valid command objects are created and executed.
+
+#### 2.2 Design Considerations
+
+**Aspect: Single parser vs multiple parsers for deadline subcommands**
+
+* **Alternative 1:** Separate parser classes for each subcommand
+    + Pros: Better separation of concerns
+    + Cons: Increased number of classes and boilerplate code
+
+* **Alternative 2 (Current Choice):** Single `DeadlineCommandParser`
+    + Pros: Centralised parsing logic for all deadline-related operations
+    + Cons: Slightly larger parser class
+
++ **Reasoning:**  
+  All deadline commands share a common prefix (`deadline`), making them
+  conceptually grouped. Centralising parsing avoids unnecessary fragmentation
+  while maintaining readability, as subcommands (`add`, `list`, `done`, `undone`, `delete`)
+  are closely related in behaviour.
+
+---
+
+### 3. Deadline Add Feature
+
+The `deadline add` command allows users to attach a new deadline to an application.
+
+#### 3.1 Implementation
+
+When `DeadlineAddCommand#execute()` is called:
+
+1. Validates application index
+2. Retrieves active `Application` from `ApplicationList`
+3. Constructs `Deadline`
+4. Adds to `DeadlineList`
+5. Displays confirmation messages via `Ui`
+6. Calls `Storage#save()`
+
+The sequence diagram below shows validation occurring before any model mutation:
+
+![Deadline Add Command Sequence Diagram](images/EugeniaDeadlineAddCommandSequence.png)
+
+#### 3.2 Parsing Logic
+
+The parser performs the following checks:
+
+1. Verifies `add` subcommand is present
+2. Verifies `t/` and `d/` prefixes exist
+3. Rejects extra arguments (e.g. unsupported prefixes)
+4. Parses index as a positive integer
+5. Validates date format (`DD-MM-YYYY`)
+
+#### 3.3 Design Considerations
+
+**Aspect: Overwrite vs append behaviour**
+
+* **Alternative 1:** Overwrite existing deadline
+    + Pros: Simpler implementation
+    + Cons: Loses previous deadlines
+
+* **Alternative 2 (Current Choice):** Append to `DeadlineList`
+    + Pros: Preserves all deadlines
+    + Cons: Requires additional structure
+    + **Reasoning:** Preserving historical deadlines is more important than simplicity
+
+  This append-based design also enables other deadline operations such as `deadline delete`,
+  where individual deadlines can be removed without affecting others.
+
+**Aspect: Validation strategy**
+
+* **Alternative 1:** Allow partial parsing and validate later
+    + Pros: Less strict parser
+    + Cons: Risk of invalid command objects
+
+* **Alternative 2 (Current Choice):** Fail-fast validation
+    + Pros: Prevents invalid states early
+    + Cons: More upfront checks
+    + **Reasoning:** Ensures command objects are always valid before execution
+
+  This also ensures consistency across related commands (e.g. `deadline done`), where invalid
+  inputs are rejected before any model state is modified.
+
+---
+
+### 4. Deadline List Feature
+
+The `deadline list` command displays all deadlines for a given application.
+
+#### 4.1 Implementation
+
+When `DeadlineListCommand#execute()` is called:
+
+1. Validates application index
+2. Retrieves active `Application` from `ApplicationList`
+3. Retrieves `DeadlineList`
+4. Checks whether the application has any deadlines
+5. Displays either:
+    - a message that no deadlines were found, or
+    - a header followed by each formatted deadline via `Ui`
+
+The sequence diagram below shows the read-only flow of the `deadline list` command:
+
+![Deadline List Command Sequence Diagram](images/EugeniaDeadlineListCommandSequence.png)
+
+#### 4.2 Parsing Logic
+
+The parser performs the following checks:
+
+1. Verifies `list` subcommand
+2. Rejects blank input with usage message
+3. Parses index as numeric
+4. Ensures index is positive
+
+#### 4.3 Design Considerations
+
+**Aspect: Inline display vs dedicated command**
+
+* **Alternative 1:** Display deadlines inside `list` command
+    + Pros: Fewer commands
+    + Cons: Clutters application view
+
+* **Alternative 2 (Current Choice):** Dedicated `deadline list` command
+    + Pros: Cleaner separation
+    + Cons: Additional command
+    + **Reasoning:** Improves readability for applications with multiple deadlines
+
+**Aspect: Ordering of deadlines**
+
+* **Alternative 1:** Sort by date
+    + Pros: Chronological order
+    + Cons: Hidden logic
+
+* **Alternative 2 (Current Choice):** Preserve insertion order
+    + Pros: Predictable behaviour
+    + Cons: Not chronological
+    + **Reasoning:** Simplicity and transparency preferred
+
+---
+
+### 5. Deadline Done Feature
+
+The `deadline done` command marks a specific deadline as completed.
+
+#### 5.1 Implementation
+
+When `DeadlineDoneCommand#execute()` is called:
+
+1. Validates application index
+2. Retrieves active `Application` from `ApplicationList`
+3. Retrieves `DeadlineList`
+4. Validates deadline index
+5. Retrieves the target `Deadline`
+6. Verifies that the deadline is not already marked as done
+7. Calls `setDone()`
+8. Displays confirmation messages via `Ui`
+9. Calls `Storage#save()`
+
+The sequence diagram below shows two-level validation before mutation:
+
+![Deadline Done Command Sequence Diagram](images/EugeniaDeadlineDoneCommandSequence.png)
+
+#### 5.2 Parsing Logic
+
+The parser performs the following checks:
+
+1. Verifies `done` subcommand
+2. Verifies `i/` prefix exists
+3. Rejects missing or malformed indices
+4. Rejects unknown subcommands
+5. Ensures both indices are numeric and positive
+
+#### 5.3 Design Considerations
+
+**Aspect: Indexing strategy**
+
+* **Alternative 1:** Global deadline index
+    + Pros: Shorter commands
+    + Cons: Breaks ownership
+
+* **Alternative 2 (Current Choice):** Two-level indexing
+    + Pros: Clear ownership
+    + Cons: Longer syntax
+    + **Reasoning:** Matches user mental model and aligns with per-application deadline storage.
+
+  This structure also supports related operations such as `deadline undone`, which reuses the same
+  indexing scheme to reverse completion state without ambiguity.
+
+**Aspect: Handling already-completed deadlines**
+
+* **Alternative 1:** Silently ignore
+    + Pros: Simpler
+    + Cons: Hides user mistakes
+
+* **Alternative 2 (Current Choice):** Throw exception
+    + Pros: Explicit feedback
+    + Cons: Slightly stricter
+    + **Reasoning:** Prevents silent logical errors and ensures users are aware of redundant actions.
+
+  This behaviour maintains consistency with `deadline undone`, where state transitions are expected
+  to be deliberate and explicit rather than silently ignored.
+
+---
+
+### 6. Deadline Undone Feature
+
+The `deadline undone` command marks a specific completed deadline as not done.
+
+#### 6.1 Implementation
+
+When `DeadlineUndoneCommand#execute()` is called:
+
+1. Validates application index
+2. Retrieves active `Application` from `ApplicationList`
+3. Retrieves `DeadlineList`
+4. Validates deadline index
+5. Retrieves the target `Deadline`
+6. Verifies that the deadline is currently marked as done
+7. Calls `setNotDone()`
+8. Displays confirmation messages via `Ui`
+9. Calls `Storage#save()`
+
+The sequence diagram below shows two-level validation before reversing the deadline state:
+
+![Deadline Undone Command Sequence Diagram](images/EugeniaDeadlineUndoneCommandSequence.png)
+
+#### 6.2 Parsing Logic
+
+The parser performs the following checks:
+
+1. Verifies `undone` subcommand
+2. Verifies `i/` prefix exists
+3. Rejects missing or malformed indices
+4. Rejects unknown subcommands
+5. Ensures both indices are numeric and positive
+
+#### 6.3 Design Considerations
+
+**Aspect: Reversing deadline state**
+
+* **Alternative 1:** Force users to delete and recreate a deadline
+    + Pros: Simpler command set
+    + Cons: Loses the original deadline entry and is inconvenient
+
+* **Alternative 2 (Current Choice):** Support explicit `deadline undone`
+    + Pros: Allows state correction without deleting data
+    + Cons: Adds another command to maintain
+    + **Reasoning:** Users may accidentally mark a deadline as done, so the system should support a direct and reversible correction workflow.
+
+**Aspect: Handling already-undone deadlines**
+
+* **Alternative 1:** Silently ignore
+    + Pros: Simpler behaviour
+    + Cons: Hides redundant user actions
+
+* **Alternative 2 (Current Choice):** Throw exception
+    + Pros: Provides explicit feedback and avoids unnecessary saves
+    + Cons: Slightly stricter behaviour
+    + **Reasoning:** Explicit feedback keeps the deadline state transitions deliberate and consistent with the defensive design used in `deadline done`.
+
+---
+
+### 7. Deadline Delete Feature
+
+The `deadline delete` command removes a specific deadline from an application.
+
+#### 7.1 Implementation
+
+When `DeadlineDeleteCommand#execute()` is called:
+
+1. Validates application index
+2. Retrieves active `Application` from `ApplicationList`
+3. Retrieves `DeadlineList`
+4. Validates deadline index
+5. Deletes the target `Deadline` from `DeadlineList`
+6. Displays confirmation messages via `Ui`
+7. Calls `Storage#save()`
+
+The sequence diagram below shows two-level validation before deleting the selected deadline:
+
+![Deadline Delete Command Sequence Diagram](images/EugeniaDeadlineDeleteCommandSequence.png)
+
+#### 7.2 Parsing Logic
+
+The parser performs the following checks:
+
+1. Verifies `delete` subcommand
+2. Verifies `i/` prefix exists
+3. Rejects missing or malformed indices
+4. Rejects unknown subcommands
+5. Ensures both indices are numeric and positive
+
+#### 7.3 Design Considerations
+
+**Aspect: Delete vs retain completed deadlines**
+
+* **Alternative 1:** Only allow deadlines to be marked done or undone
+    + Pros: Preserves complete deadline history
+    + Cons: Cannot remove cancelled or irrelevant deadlines
+
+* **Alternative 2 (Current Choice):** Allow explicit deletion
+    + Pros: Gives users full control over deadline cleanup
+    + Cons: Deleted deadlines cannot be recovered
+    + **Reasoning:** Some deadlines become irrelevant, such as cancelled interviews or outdated tasks, so users should be able to remove them completely.
+
+**Aspect: Deletion target selection**
+
+* **Alternative 1:** Delete by matching deadline type or date
+    + Pros: More descriptive command format
+    + Cons: Ambiguous when multiple deadlines share similar details
+
+* **Alternative 2 (Current Choice):** Delete by deadline index within an application
+    + Pros: Precise and consistent with `deadline list`
+    + Cons: Requires users to inspect the list first
+    + **Reasoning:** Index-based deletion is unambiguous and fits naturally with the per-application list design.
+
+---
+
+### 8. Display Design
+
+#### 8.1 `null` vs `-`
+
+**Earlier design:**
+- Displayed `null`
+
+**Current design:**
+- Displayed `-`
+
+**Reasoning:**
+- Improves readability
+- Hides internal representation
+- Maintains consistent UX
+
+---
+
 <!-- @@author -->
 
 <!-- @@author Shyamal -->
