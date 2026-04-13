@@ -1,0 +1,37 @@
+@startuml
+actor User
+participant ":Parser" as P
+participant ":DeadlineCommandParser" as DCP
+participant "dac:DeadlineAddCommand" as DAC
+participant ":ApplicationList" as AL
+participant "app:Application" as APP
+participant "dl:DeadlineList" as DL
+participant "d:Deadline" as D
+participant ":Ui" as UI
+participant ":Storage" as S
+
+User -> P : parse("deadline add 2 t/Tech Round d/01-11-2026")
+P -> DCP : parse("add 2 t/Tech Round d/01-11-2026")
+DCP -> DAC : <<create>>
+DCP --> P : dac
+
+User -> DAC : execute(applications, ui, storage)
+
+DAC -> AL : countActive()
+AL --> DAC : activeCount
+
+alt invalid application index
+    DAC --> User : throws InternTrackrException
+else valid application index
+    DAC -> D : <<create>>
+    DAC -> AL : getActiveApplication(index)
+    AL --> DAC : app
+    DAC -> APP : getDeadlines()
+    APP --> DAC : dl
+    DAC -> DL : addDeadline(d)
+    DAC -> UI : showMessage(...)
+    DAC -> AL : getApplications()
+    AL --> DAC : applications
+    DAC -> S : save(applications)
+end
+@enduml
