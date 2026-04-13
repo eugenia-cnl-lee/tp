@@ -339,6 +339,8 @@ The `NoteCommandParser#parse()` method processes the user input as follows:
 4. **Content Check:** Verifies the note content is not blank.
 5. **Index Parse:** Parses the index as a positive integer; throws an
    `InternTrackrException` for non-numeric or non-positive values.
+6. **Index Validation:** Verifies the index is a positive integer (≥ 1); throws an
+   `InternTrackrException` if zero or negative.
 
 **4.1.2 Execution Logic**
 
@@ -348,7 +350,8 @@ When `NoteCommand#execute()` is called:
 2. It calls `Application#setNote()` to update the note field, overwriting any
    previously stored note.
 3. It immediately calls `Storage#save()` to persist the note to disk.
-4. It displays a confirmation message via `Ui`.
+4. It displays two confirmation messages via `Ui` — the application identity
+   and the updated note content.
 
 The sequence diagram below shows the full flow of the `note` command:
 
