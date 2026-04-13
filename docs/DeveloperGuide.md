@@ -526,6 +526,7 @@ The parser performs the following checks:
     + Pros: Provides explicit feedback and avoids unnecessary saves
     + Cons: Slightly stricter behaviour
     + **Reasoning:** Explicit feedback keeps the deadline state transitions deliberate and consistent with the defensive design used in `deadline done`.
+
 ---
 
 ### 7. Deadline Delete Feature
@@ -544,7 +545,9 @@ When `DeadlineDeleteCommand#execute()` is called:
 6. Displays confirmation messages via `Ui`
 7. Calls `Storage#save()`
 
-Unlike `deadline done` and `deadline undone`, this command removes the deadline entirely rather than updating its completion state.
+The sequence diagram below shows two-level validation before deleting the selected deadline:
+
+![Deadline Delete Command Sequence Diagram](images/EugeniaDeadlineDeleteCommandSequence.png)
 
 #### 7.2 Parsing Logic
 
@@ -560,14 +563,14 @@ The parser performs the following checks:
 
 **Aspect: Delete vs retain completed deadlines**
 
-* **Alternative 1:** Only allow deadlines to be marked done/undone
+* **Alternative 1:** Only allow deadlines to be marked done or undone
     + Pros: Preserves complete deadline history
     + Cons: Cannot remove cancelled or irrelevant deadlines
 
 * **Alternative 2 (Current Choice):** Allow explicit deletion
     + Pros: Gives users full control over deadline cleanup
     + Cons: Deleted deadlines cannot be recovered
-    + **Reasoning:** Some deadlines become irrelevant (e.g. cancelled interviews), so users should be able to remove them completely.
+    + **Reasoning:** Some deadlines become irrelevant, such as cancelled interviews or outdated tasks, so users should be able to remove them completely.
 
 **Aspect: Deletion target selection**
 
