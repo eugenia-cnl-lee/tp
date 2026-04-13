@@ -31,10 +31,10 @@
 
 **Some PRs Reviewed**
 
-*(https://github.com/AY2526S2-CS2113-T14-1/tp/pull/104#pullrequestreview-4051515222)*
-*(https://github.com/AY2526S2-CS2113-T14-1/tp/pull/76#pullrequestreview-4011729253)*
-*(https://github.com/AY2526S2-CS2113-T14-1/tp/pull/44#pullrequestreview-3967573085)*
-*(https://github.com/AY2526S2-CS2113-T14-1/tp/pull/18#pullrequestreview-3934536109*)
+*[PR 1](https://github.com/AY2526S2-CS2113-T14-1/tp/pull/104#pullrequestreview-4051515222)*
+*[PR 2](https://github.com/AY2526S2-CS2113-T14-1/tp/pull/76#pullrequestreview-4011729253)*
+*[PR 3](https://github.com/AY2526S2-CS2113-T14-1/tp/pull/44#pullrequestreview-3967573085)*
+*[PR 4](https://github.com/AY2526S2-CS2113-T14-1/tp/pull/18#pullrequestreview-3934536109)*
 ---
 ### 5. Contributions to the User Guide
 
