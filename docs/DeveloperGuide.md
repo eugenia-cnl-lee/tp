@@ -470,9 +470,119 @@ The parser performs the following checks:
 
 ---
 
-### 6. Display Design
+### 6. Deadline Undone Feature
 
-#### 6.1 `null` vs `-`
+The `deadline undone` command marks a specific completed deadline as not done.
+
+#### 6.1 Implementation
+
+When `DeadlineUndoneCommand#execute()` is called:
+
+1. Validates application index
+2. Retrieves active `Application` from `ApplicationList`
+3. Retrieves `DeadlineList`
+4. Validates deadline index
+5. Retrieves the target `Deadline`
+6. Verifies that the deadline is currently marked as done
+7. Calls `setNotDone()`
+8. Displays confirmation messages via `Ui`
+9. Calls `Storage#save()`
+
+This mirrors the `deadline done` flow, but reverses the completion state.
+
+#### 6.2 Parsing Logic
+
+The parser performs the following checks:
+
+1. Verifies `undone` subcommand
+2. Verifies `i/` prefix exists
+3. Rejects missing or malformed indices
+4. Rejects unknown subcommands
+5. Ensures both indices are numeric and positive
+
+#### 6.3 Design Considerations
+
+**Aspect: Reuse of indexing strategy**
+
+* **Alternative 1:** Introduce a separate indexing scheme for undone operations
+    + Pros: Could be tailored specifically to completion-state updates
+    + Cons: Inconsistent with other deadline commands
+
+* **Alternative 2 (Current Choice):** Reuse the same two-level indexing scheme
+    + Pros: Consistent with `deadline done` and `deadline delete`
+    + Cons: Slightly longer syntax
+    + **Reasoning:** Users should not need to learn a new indexing model for closely related deadline operations.
+
+**Aspect: Handling already-undone deadlines**
+
+* **Alternative 1:** Silently ignore
+    + Pros: Simpler behaviour
+    + Cons: Hides redundant user actions
+
+* **Alternative 2 (Current Choice):** Throw exception
+    + Pros: Provides explicit feedback and avoids unnecessary saves
+    + Cons: Slightly stricter behaviour
+    + **Reasoning:** Explicit feedback is preferred so users know the current state of the selected deadline.
+
+---
+
+### 7. Deadline Delete Feature
+
+The `deadline delete` command removes a specific deadline from an application.
+
+#### 7.1 Implementation
+
+When `DeadlineDeleteCommand#execute()` is called:
+
+1. Validates application index
+2. Retrieves active `Application` from `ApplicationList`
+3. Retrieves `DeadlineList`
+4. Validates deadline index
+5. Deletes the target `Deadline` from `DeadlineList`
+6. Displays confirmation messages via `Ui`
+7. Calls `Storage#save()`
+
+Unlike `deadline done` and `deadline undone`, this command removes the deadline entirely rather than updating its completion state.
+
+#### 7.2 Parsing Logic
+
+The parser performs the following checks:
+
+1. Verifies `delete` subcommand
+2. Verifies `i/` prefix exists
+3. Rejects missing or malformed indices
+4. Rejects unknown subcommands
+5. Ensures both indices are numeric and positive
+
+#### 7.3 Design Considerations
+
+**Aspect: Delete vs retain completed deadlines**
+
+* **Alternative 1:** Only allow deadlines to be marked done/undone
+    + Pros: Preserves complete deadline history
+    + Cons: Cannot remove cancelled or irrelevant deadlines
+
+* **Alternative 2 (Current Choice):** Allow explicit deletion
+    + Pros: Gives users full control over deadline cleanup
+    + Cons: Deleted deadlines cannot be recovered
+    + **Reasoning:** Some deadlines become irrelevant (e.g. cancelled interviews), so users should be able to remove them completely.
+
+**Aspect: Deletion target selection**
+
+* **Alternative 1:** Delete by matching deadline type or date
+    + Pros: More descriptive command format
+    + Cons: Ambiguous when multiple deadlines share similar details
+
+* **Alternative 2 (Current Choice):** Delete by deadline index within an application
+    + Pros: Precise and consistent with `deadline list`
+    + Cons: Requires users to inspect the list first
+    + **Reasoning:** Index-based deletion is unambiguous and fits naturally with the per-application list design.
+
+---
+
+### 8. Display Design
+
+#### 8.1 `null` vs `-`
 
 **Earlier design:**
 - Displayed `null`
