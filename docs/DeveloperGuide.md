@@ -172,38 +172,276 @@ To handle applications accumulating large numbers of deadlines without clutterin
 <!-- @@author -->
 
 <!-- @@author eugenia-cnl-lee -->
-### Deadline Features
 
-**Author:** Eugenia
+### Deadline Feature Implementation
 
-The `deadline list` command allows users to view all deadlines associated with a specific application.
+**Author:** Chun Nga Lee
 
-#### Implementation Details
-
-1. The command takes in the target index.
-2. It retrieves the corresponding `Application` from `ApplicationList`.
-3. It accesses the application's associated deadlines.
-4. Each deadline is formatted and displayed via `Ui`.
-
-#### Design Considerations
-
-**Aspect: Supporting multiple deadlines per application**
-
-* **Alternative 1 (previous design):** Store a single `Deadline` in `Application`
-  * Pros: Simpler implementation
-  * Cons: Cannot support multiple deadlines per application
-
-* **Alternative 2 (Current Choice):** Introduce a `DeadlineList`
-  * Pros: Supports multiple deadlines and enables future features such as sorting and filtering
-  * Cons: Requires refactoring across model, storage, and commands
-
-* **Reasoning:** Internship applications often involve multiple stages (e.g. OA, interviews, offers), each with its own deadline. Supporting multiple deadlines improves realism and extensibility.
-
-#### Notes
-
-* Index validation ensures safe access to applications
-* If no deadlines exist, an appropriate message is shown to the user
 ---
+
+#### 1. Deadline Model Design
+
+The deadline feature is built on a model where each `Application` owns a `DeadlineList`,
+which contains multiple `Deadline` objects.
+
+The diagram below shows the ownership structure and encapsulation of deadlines:
+
+![Deadline Class Diagram](images/DeadlineClassDiagram.png)
+
+**1.1 Evolution of Design**
+
+**Iteration 1 (v1.0): Single deadline per application**
+
+- `Application` stored a single `Deadline`
+
+*Pros:*
+- Simpler implementation
+- Minimal changes to model
+
+*Cons:*
+- New deadlines overwrite existing ones
+- Cannot represent multiple stages
+- Prevents `deadline list` feature
+
+**Iteration 2 (v2.0): Multiple deadlines via `DeadlineList` (Current Choice)**
+
+- `Application` stores a `DeadlineList`
+
+*Pros:*
+- Supports multiple deadlines
+- Enables indexed operations (`list`, `done`)
+- Aligns with real-world workflows
+
+*Cons:*
+- Requires refactoring across components
+
+**Reasoning:**
+A list-based design better models real internship workflows and allows future extensions.
+
+**1.2 Model Constraints**
+
+- `deadlineType` must not be null or blank
+- `dueDate` must not be null
+- `deadlineType` is trimmed before storage
+- `isDone` defaults to `false`
+- Deadlines are scoped per application (no global access)
+- State modified only via model methods (`setDone()`)
+
+---
+
+#### 2. Deadline Add Feature
+
+The `deadline add` command allows users to attach a new deadline to an application.
+
+**2.1 Implementation**
+
+When `DeadlineAddCommand#execute()` is called:
+
+1. Validates application index
+2. Retrieves `Application`
+3. Constructs `Deadline`
+4. Adds to `DeadlineList`
+5. Calls `Storage#save()`
+
+The sequence diagram below shows validation occurring before mutation:
+
+![Deadline Add Sequence Diagram](images/DeadlineAddSequence.png)
+
+**2.2 Parsing Logic**
+
+The parser performs the following checks:
+
+1. Verifies `add` subcommand is present
+2. Verifies `t/` and `d/` prefixes exist
+3. Rejects extra arguments (e.g. unsupported prefixes)
+4. Parses index as a positive integer
+5. Validates date format (`DD-MM-YYYY`)
+
+**2.3 Design Considerations**
+
+**Aspect: Overwrite vs append behaviour**
+
+* **Alternative 1:** Overwrite existing deadline
+    + Pros: Simpler implementation
+    + Cons: Loses previous deadlines
+
+* **Alternative 2 (Current Choice):** Append to `DeadlineList`
+    + Pros: Preserves all deadlines
+    + Cons: Requires additional structure
+    + **Reasoning:** Preserving historical deadlines is more important than simplicity
+
+  This append-based design also enables other deadline operations such as `deadline delete`,
+  where individual deadlines can be removed without affecting others.
+
+**Aspect: Validation strategy**
+
+* **Alternative 1:** Allow partial parsing and validate later
+    + Pros: Less strict parser
+    + Cons: Risk of invalid command objects
+
+* **Alternative 2 (Current Choice):** Fail-fast validation
+    + Pros: Prevents invalid states early
+    + Cons: More upfront checks
+    + **Reasoning:** Ensures command objects are always valid before execution
+
+  This also ensures consistency across related commands (e.g. `deadline done`), where invalid
+  inputs are rejected before any model state is modified.
+
+---
+
+#### 3. Deadline List Feature
+
+The `deadline list` command displays all deadlines for a given application.
+
+**3.1 Implementation**
+
+When `DeadlineListCommand#execute()` is called:
+
+1. Validates application index
+2. Retrieves `Application`
+3. Retrieves deadlines
+4. Displays via `Ui`
+
+The sequence diagram below shows a read-only traversal of the model:
+
+![Deadline List Sequence Diagram](images/DeadlineListSequence.png)
+
+**3.2 Parsing Logic**
+
+The parser performs the following checks:
+
+1. Verifies `list` subcommand
+2. Rejects blank input with usage message
+3. Parses index as numeric
+4. Ensures index is positive
+
+**3.3 Design Considerations**
+
+**Aspect: Inline display vs dedicated command**
+
+* **Alternative 1:** Display deadlines inside `list` command
+    + Pros: Fewer commands
+    + Cons: Clutters application view
+
+* **Alternative 2 (Current Choice):** Dedicated `deadline list` command
+    + Pros: Cleaner separation
+    + Cons: Additional command
+    + **Reasoning:** Improves readability for applications with multiple deadlines
+
+**Aspect: Ordering of deadlines**
+
+* **Alternative 1:** Sort by date
+    + Pros: Chronological order
+    + Cons: Hidden logic
+
+* **Alternative 2 (Current Choice):** Preserve insertion order
+    + Pros: Predictable behaviour
+    + Cons: Not chronological
+    + **Reasoning:** Simplicity and transparency preferred
+
+---
+
+#### 4. Deadline Done Feature
+
+The `deadline done` command marks a specific deadline as completed.
+
+**4.1 Implementation**
+
+When `DeadlineDoneCommand#execute()` is called:
+
+1. Validates application index
+2. Retrieves `Application`
+3. Retrieves `DeadlineList`
+4. Validates deadline index
+5. Calls `setDone()`
+6. Calls `Storage#save()`
+
+The sequence diagram below shows two-level validation before mutation:
+
+![Deadline Done Sequence Diagram](images/DeadlineDoneSequence.png)
+
+**4.2 Parsing Logic**
+
+The parser performs the following checks:
+
+1. Verifies `done` subcommand
+2. Verifies `i/` prefix exists
+3. Rejects missing or malformed indices
+4. Rejects unknown subcommands
+5. Ensures both indices are numeric and positive
+
+**4.3 Design Considerations**
+
+**Aspect: Indexing strategy**
+
+* **Alternative 1:** Global deadline index
+    + Pros: Shorter commands
+    + Cons: Breaks ownership
+
+* **Alternative 2 (Current Choice):** Two-level indexing
+    + Pros: Clear ownership
+    + Cons: Longer syntax
+    + **Reasoning:** Matches user mental model and aligns with per-application deadline storage.
+
+  This structure also supports related operations such as `deadline undone`, which reuses the same
+  indexing scheme to reverse completion state without ambiguity.
+
+**Aspect: Handling already-completed deadlines**
+
+* **Alternative 1:** Silently ignore
+    + Pros: Simpler
+    + Cons: Hides user mistakes
+
+* **Alternative 2 (Current Choice):** Throw exception
+    + Pros: Explicit feedback
+    + Cons: Slightly stricter
+    + **Reasoning:** Prevents silent logical errors and ensures users are aware of redundant actions.
+
+  This behaviour maintains consistency with `deadline undone`, where state transitions are expected
+  to be deliberate and explicit rather than silently ignored.
+
+---
+
+#### 5. Display Design
+
+**5.1 `null` vs `-`**
+
+**Earlier design:**
+- Displayed `null`
+
+**Current design:**
+- Displayed `-`
+
+**Reasoning:**
+- Improves readability
+- Hides internal representation
+- Maintains consistent UX
+
+---
+
+#### 6. Contact Feature (Summary)
+
+The `contact` feature stores recruiter details directly in `Application`.
+
+The diagram below shows contact fields embedded within `Application`:
+
+![Contact Class Diagram](images/ContactClassDiagram.png)
+
+**6.1 Design Considerations**
+
+**Aspect: Separate class vs inline fields**
+
+* **Alternative 1:** Separate `Contact` class
+    + Pros: More extensible
+    + Cons: Over-engineering
+
+* **Alternative 2 (Current Choice):** Inline storage
+    + Pros: Simpler
+    + Cons: Less flexible
+    + **Reasoning:** Current requirements do not justify additional abstraction
+
+---
+
 <!-- @@author -->
 
 <!-- @@author Shyamal -->
