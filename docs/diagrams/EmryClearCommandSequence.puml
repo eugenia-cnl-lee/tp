@@ -21,7 +21,7 @@ activate UI
 UI --> CC : "yes"
 deactivate UI
 
-alt response.equalsIgnoreCase("yes")
+opt response.equalsIgnoreCase("yes")
     CC -> AL : clear()
     activate AL
     AL --> CC

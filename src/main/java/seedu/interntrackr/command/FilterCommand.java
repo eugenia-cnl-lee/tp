@@ -87,6 +87,9 @@ public class FilterCommand extends Command {
             if (app != null && !app.isArchived()) {
                 if (app.getStatus().equals(searchStatus)) {
                     ui.showMessage(displayIndex + ". " + app.toString());
+                    if (app.getNote() != null && !app.getNote().trim().isEmpty()) {
+                        ui.showMessage("   Note: " + app.getNote());
+                    }
                     matchCount++;
                 }
                 displayIndex++;

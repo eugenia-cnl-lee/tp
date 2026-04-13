@@ -22,7 +22,7 @@ loop for each application in ApplicationList
     AL --> FC : app
     deactivate AL
 
-    alt app matches filter criteria AND is not archived
+    opt app matches filter criteria AND is not archived
         FC -> UI : showMessage(app.toString())
         activate UI
         UI --> FC

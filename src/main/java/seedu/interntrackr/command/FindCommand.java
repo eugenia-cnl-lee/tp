@@ -60,7 +60,11 @@ public class FindCommand extends Command {
         } else {
             ui.showMessage("Here are the matching applications in your list:");
             for (int i = 0; i < matchingApps.size(); i++) {
-                ui.showMessage(matchingIndices.get(i) + ". " + matchingApps.get(i).toString());
+                Application app = matchingApps.get(i);
+                ui.showMessage(matchingIndices.get(i) + ". " + app.toString());
+                if (app.getNote() != null && !app.getNote().trim().isEmpty()) {
+                    ui.showMessage("   Note: " + app.getNote());
+                }
             }
         }
     }
