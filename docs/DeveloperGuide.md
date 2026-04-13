@@ -489,7 +489,9 @@ When `DeadlineUndoneCommand#execute()` is called:
 8. Displays confirmation messages via `Ui`
 9. Calls `Storage#save()`
 
-This mirrors the `deadline done` flow, but reverses the completion state.
+The sequence diagram below shows two-level validation before reversing the deadline state:
+
+![Deadline Undone Command Sequence Diagram](images/EugeniaDeadlineUndoneCommandSequence.png)
 
 #### 6.2 Parsing Logic
 
@@ -503,16 +505,16 @@ The parser performs the following checks:
 
 #### 6.3 Design Considerations
 
-**Aspect: Reuse of indexing strategy**
+**Aspect: Reversing deadline state**
 
-* **Alternative 1:** Introduce a separate indexing scheme for undone operations
-    + Pros: Could be tailored specifically to completion-state updates
-    + Cons: Inconsistent with other deadline commands
+* **Alternative 1:** Force users to delete and recreate a deadline
+    + Pros: Simpler command set
+    + Cons: Loses the original deadline entry and is inconvenient
 
-* **Alternative 2 (Current Choice):** Reuse the same two-level indexing scheme
-    + Pros: Consistent with `deadline done` and `deadline delete`
-    + Cons: Slightly longer syntax
-    + **Reasoning:** Users should not need to learn a new indexing model for closely related deadline operations.
+* **Alternative 2 (Current Choice):** Support explicit `deadline undone`
+    + Pros: Allows state correction without deleting data
+    + Cons: Adds another command to maintain
+    + **Reasoning:** Users may accidentally mark a deadline as done, so the system should support a direct and reversible correction workflow.
 
 **Aspect: Handling already-undone deadlines**
 
@@ -523,8 +525,7 @@ The parser performs the following checks:
 * **Alternative 2 (Current Choice):** Throw exception
     + Pros: Provides explicit feedback and avoids unnecessary saves
     + Cons: Slightly stricter behaviour
-    + **Reasoning:** Explicit feedback is preferred so users know the current state of the selected deadline.
-
+    + **Reasoning:** Explicit feedback keeps the deadline state transitions deliberate and consistent with the defensive design used in `deadline done`.
 ---
 
 ### 7. Deadline Delete Feature
