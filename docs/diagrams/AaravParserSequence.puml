@@ -1,9 +1,12 @@
 @startuml
 actor User
+participant ":InternTrackr" as IT
 participant ":Parser" as P
 participant ":XYZCommandParser" as XCP
 
-User -> P : parse(fullCommand)
+User -> IT : run(fullCommand)
+IT -> P : parse(fullCommand)
+
 note right of P
   Rejects blank input and
   input containing "|"
@@ -16,7 +19,8 @@ else simple command (list, list archive, overview, ...)
     note right of P : Command created directly
 end
 
-P --> User : command
+P --> IT : command
+
 note right of P
   Diagram simplified.
   Each command routes to its

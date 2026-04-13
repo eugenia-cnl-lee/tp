@@ -1,17 +1,22 @@
 @startuml
 actor User
+participant ":InternTrackr" as IT
 participant ":Parser" as P
+participant ":AddCommandParser" as ACP
 participant ":AddCommand" as AC
 participant "newApp:Application" as APP
 participant ":ApplicationList" as AL
 participant ":Ui" as UI
 participant ":Storage" as S
 
-User -> P : parse("add c/Google r/SWE")
-P -> AC : <<create>>
+User -> IT : run("add c/Google r/SWE")
+IT -> P : parse(fullCommand)
+P -> ACP : parse(arguments)
+ACP --> P : command
+P --> IT : command
 
+IT -> AC : execute(...)
 AC -> APP : <<create>>
-
 AC -> AL : hasApplication(newApp)
 
 alt duplicate found

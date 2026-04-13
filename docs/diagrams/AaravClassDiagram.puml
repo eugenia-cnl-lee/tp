@@ -35,10 +35,7 @@ class Application {
 }
 
 Command <|-- XYZCommand
-
 Parser ..> XYZCommandParser : delegates to
-
 XYZCommand ..> ApplicationList : uses
-
 ApplicationList "1" o-- "0..*" Application
 @enduml
