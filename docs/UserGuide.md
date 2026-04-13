@@ -50,6 +50,12 @@ Shows a message explaining how to access the full online User Guide.
 
 **Format:** `help`
 
+**Example output:**
+```
+Need help? You can view the full User Guide with all commands here:
+https://ay2526s2-cs2113-t14-1.github.io/tp/UserGuide.html
+```
+
 ### Adding an application : `add`
 
 Adds an internship application.
@@ -263,7 +269,7 @@ Finds applications whose company name or role contains the specified keyword.
 
 **Example output:**
 ```
-Here are the matching applications in your list:`
+Here are the matching applications in your list:
 1. Company: Shopee | Role: Backend Intern | Status: Applied | ...
 ```
 

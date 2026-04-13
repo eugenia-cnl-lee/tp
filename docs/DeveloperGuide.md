@@ -3,7 +3,7 @@
 ## Acknowledgements
 
 * **SE-EDU Initiative:** The overall architecture of this application (particularly the separation of `Ui`, `Parser`, `Storage`, and `Command` classes) was inspired by the [SE-EDU AddressBook-Level2 and Duke/ip projects](https://se-education.org/), created for software engineering education.
-* **Libraries:** This project relies solely on standard Java 11/17 libraries for core execution. [JUnit 5](https://junit.org/junit5/) is used for automated unit testing.
+* **Libraries:** Libraries: This project relies solely on standard Java 17 libraries for core execution. [JUnit 5](https://junit.org/junit5/) is used for automated unit testing.
 
 ## Design & implementation
 
@@ -342,8 +342,7 @@ The `NoteCommandParser#parse()` method processes the user input as follows:
 
 When `NoteCommand#execute()` is called:
 
-1. It uses `ApplicationList#getApplication()` to retrieve the target application,
-   which performs bounds checking automatically.
+1. It uses ApplicationList#getActiveApplication(index) to retrieve the target application, which performs bounds checking automatically against the active list.
 2. It calls `Application#setNote()` to update the note field, overwriting any
    previously stored note.
 3. It immediately calls `Storage#save()` to persist the note to disk.
@@ -471,7 +470,7 @@ The `StatusCommandParser#parse()` method breaks down the complex command string:
 **2.1.2 Execution Logic**
 The `StatusCommand#execute()` method follows a strict validation-then-update pipeline:
 1.  **Dependency Assertion**: Uses Java `assert` statements to ensure `ApplicationList`, `Ui`, and `Storage` are not null.
-2.  **Bounds Validation**: Checks if the provided index is greater than 0 and less than or equal to `applications.getSize()`. If out of bounds, it provides a user-friendly error message showing the valid range.
+2.  **Bounds Validation**: Checks if the provided index is greater than 0 and less than or equal to `applications.countActive()`. If out of bounds, it provides a user-friendly error message showing the valid range.
 3.  **Content Validation**: Rejects empty status strings and checks against the master list of valid statuses (Applied, Pending, etc.) via `Application#isValidStatus()`.
 4.  **The Update**: Retrieves the target `Application` object and updates its internal status field with the normalized string.
 5.  **Immediate Persistence**: Unlike read-only commands, this command immediately calls `storage.save()`. This ensures that the progress is saved to the hard drive instantly.
