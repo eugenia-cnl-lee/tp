@@ -1,0 +1,32 @@
+@startuml
+actor User
+participant ":Parser" as P
+participant ":DeadlineCommandParser" as DCP
+participant "dac:DeadlineAddCommand" as DAC
+participant "dlc:DeadlineListCommand" as DLC
+participant "ddc:DeadlineDoneCommand" as DDC
+participant "duc:DeadlineUndoneCommand" as DUC
+participant "ddelc:DeadlineDeleteCommand" as DDELC
+
+User -> P : parse("deadline ...")
+P -> DCP : parse(arguments)
+
+alt add subcommand
+    DCP -> DAC : <<create>>
+    DCP --> P : dac
+else list subcommand
+    DCP -> DLC : <<create>>
+    DCP --> P : dlc
+else done subcommand
+    DCP -> DDC : <<create>>
+    DCP --> P : ddc
+else undone subcommand
+    DCP -> DUC : <<create>>
+    DCP --> P : duc
+else delete subcommand
+    DCP -> DDELC : <<create>>
+    DCP --> P : ddelc
+else invalid subcommand or malformed input
+    DCP --> P : throws InternTrackrException
+end
+@enduml
