@@ -35,7 +35,7 @@ Refer to the [Features](#features) section below for details.
 > **Notes about the command format:**
 >
 > - Words in `UPPER_CASE` are parameters to be supplied by you.
-    >   - Example: in `add c/COMPANY`, `COMPANY` can be `add c/"Shopee"` ...
+    >   - Example: in `add c/COMPANY`, `COMPANY` can be `Shopee` or `"Shopee"` (with optional quotes).
 > - Items in square brackets are optional.
     >   - Example: `deadline add ID t/TYPE d/DATE [n/NOTES]`
 > - Parameters can be in any order unless stated otherwise.
@@ -64,7 +64,7 @@ Adds an internship application.
 
 - Creates a new application with the given company and role.
 - Prefixes can be provided in any order.
-- Duplicate applications are not allowed.
+- Duplicate applications are not allowed. If you want to re-add an application that already exists in the archive (e.g. reapplying next cycle), please first delete the archived entry using `delete archive INDEX`, then use `add` again.
 - The count shown in the confirmation message reflects only active (non-archived) applications.
 
 **Examples:**
