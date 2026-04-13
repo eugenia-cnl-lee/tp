@@ -188,6 +188,20 @@ The diagram below shows the ownership structure and encapsulation of deadlines:
 
 ![Deadline Class Diagram](images/EugeniaClassDiagram.png)
 
+The diagram below illustrates a snapshot of the system where a single
+application contains multiple deadlines with different completion states:
+
+![Deadline Object Diagram](images/EugeniaObjectDiagram.png)
+
+In this example, `app1` represents an application that owns a `DeadlineList`,
+which contains two `Deadline` objects:
+
+- `d1` is marked as completed (`isDone = true`)
+- `d2` is still pending (`isDone = false`)
+
+This demonstrates how multiple deadlines are associated with a single application
+and how their completion states are tracked independently.
+
 #### 1.1 Evolution of Design
 
 **Iteration 1 (v1.0): Single deadline per application**
