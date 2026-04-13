@@ -238,14 +238,15 @@ The `deadline add` command allows users to attach a new deadline to an applicati
 When `DeadlineAddCommand#execute()` is called:
 
 1. Validates application index
-2. Retrieves `Application`
+2. Retrieves active `Application` from `ApplicationList`
 3. Constructs `Deadline`
 4. Adds to `DeadlineList`
-5. Calls `Storage#save()`
+5. Displays confirmation message via `Ui`
+6. Calls `Storage#save()`
 
-The sequence diagram below shows validation occurring before mutation:
+The sequence diagram below shows validation occurring before any model mutation:
 
-![Deadline Add Sequence Diagram](images/DeadlineAddSequence.png)
+![Deadline Add Command Sequence Diagram](images/EugeniaDeadlineAddCommandSequence.png)
 
 **2.2 Parsing Logic**
 
