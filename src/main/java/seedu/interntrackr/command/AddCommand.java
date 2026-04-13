@@ -69,7 +69,7 @@ public class AddCommand extends Command {
 
         ui.showMessage("Got it. I've added this application:");
         ui.showMessage("  " + newApp.toString());
-        ui.showMessage("Now you have " + applications.getSize() + " application(s) in the list.");
+        ui.showMessage("Now you have " + applications.countActive() + " active application(s) in the list.");
 
         storage.save(applications.getApplications());
         logger.fine("AddCommand executed and saved. Total applications: " + applications.getSize());
